@@ -21,7 +21,8 @@
         android:layout_height="wrap_content"
         android:hint="Tên đăng nhập"
         android:inputType="text"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_input"/>
 
     <EditText
         android:id="@+id/edtRegisterPassword"
@@ -29,7 +30,8 @@
         android:layout_height="wrap_content"
         android:hint="Mật khẩu"
         android:inputType="textPassword"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_input"/>
 
     <EditText
         android:id="@+id/edtRegisterConfirmPassword"
@@ -37,7 +39,8 @@
         android:layout_height="wrap_content"
         android:hint="Nhập lại mật khẩu"
         android:inputType="textPassword"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_input"/>
 
     <Button
         android:id="@+id/btnRegister"

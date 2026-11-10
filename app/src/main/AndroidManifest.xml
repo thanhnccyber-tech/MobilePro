@@ -20,7 +20,7 @@
 
         <activity android:name=".RegisterActivity" />
 
-        <activity android:name=".FruitListActivity" />
+        <activity android:name=".ProductListActivity" />
 
         <activity android:name=".ProductDetailActivity" />
     </application>

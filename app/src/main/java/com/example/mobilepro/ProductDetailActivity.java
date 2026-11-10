@@ -1,6 +1,7 @@
 package com.example.mobilepro;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ public class ProductDetailActivity extends AppCompatActivity {
         TextView tvName = findViewById(R.id.tvDetailName);
         TextView tvPrice = findViewById(R.id.tvDetailPrice);
         TextView tvDescription = findViewById(R.id.tvDetailDescription);
+        Button btnBack = findViewById(R.id.btnBack);
 
         Product product = (Product) getIntent().getSerializableExtra("product");
 
@@ -26,5 +28,7 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvPrice.setText("Giá: " + product.getPrice());
             tvDescription.setText(product.getDescription());
         }
+
+        btnBack.setOnClickListener(v -> finish());
     }
 }

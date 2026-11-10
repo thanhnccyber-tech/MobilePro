@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    Button btnLogin, btnGoToRegister, btnGoToList;
+    Button btnLogin, btnGoToRegister;
     EditText edtUsername, edtPassword;
 
 
@@ -20,7 +20,6 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin = findViewById(R.id.btnLogin);
         btnGoToRegister = findViewById(R.id.btnGoToRegister);
-        btnGoToList = findViewById(R.id.btnGoToList);
         edtUsername = findViewById(R.id.edtLoginUsername);
         edtPassword = findViewById(R.id.edtLoginPassword);
 
@@ -30,8 +29,8 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        btnGoToList.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, FruitListActivity.class);
+        btnLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ProductListActivity.class);
             startActivity(intent);
         });
     }

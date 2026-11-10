@@ -21,7 +21,8 @@
         android:layout_height="wrap_content"
         android:hint="Tên đăng nhập"
         android:inputType="text"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_input"/>
 
     <EditText
         android:id="@+id/edtLoginPassword"
@@ -29,7 +30,8 @@
         android:layout_height="wrap_content"
         android:hint="Mật khẩu"
         android:inputType="textPassword"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_input"/>
 
     <Button
         android:id="@+id/btnLogin"
@@ -45,12 +47,5 @@
         android:layout_height="wrap_content"
         android:text="Chưa có tài khoản? Đăng ký"/>
 
-    <Button
-        android:id="@+id/btnGoToList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="#237A29"
-        android:text="Xem danh sách" />
 
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -43,11 +44,12 @@ public class ProductAdapter extends BaseAdapter {
 
         Product product = productList.get(position);
 
-
+        ImageView imgProduct = convertView.findViewById(R.id.imgProduct);
         TextView tvName = convertView.findViewById(R.id.tvProductName);
         TextView tvPrice = convertView.findViewById(R.id.tvProductPrice);
         TextView tvDescription = convertView.findViewById(R.id.tvProductDescription);
 
+        imgProduct.setImageResource(product.getImageResId());
         tvName.setText(product.getName());
         tvPrice.setText("Giá: " + product.getPrice());
         tvDescription.setText(product.getDescription());
