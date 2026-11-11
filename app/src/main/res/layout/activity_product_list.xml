@@ -6,14 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Nội dung chính -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header: nút menu + tiêu đề -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,8 +25,8 @@
                 android:layout_height="wrap_content"
                 android:text="☰"
                 android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:background="?attr/selectableItemBackground" />
+                android:backgroundTint="#3F51B5"
+                android:textColor="#FFFFFF" />
 
             <TextView
                 android:id="@+id/textView"
@@ -49,40 +47,15 @@
             android:layout_weight="1"
             android:padding="3dp" />
 
-        <!-- Thanh phân trang -->
-        <LinearLayout
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingTop="8dp">
-
-            <Button
-                android:id="@+id/btnPrev"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Trước" />
-
-            <TextView
-                android:id="@+id/tvPageInfo"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:textSize="16sp"
-                android:text="Trang 1 / 1" />
-
-            <Button
-                android:id="@+id/btnNext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sau" />
-
-        </LinearLayout>
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_nav_menu" />
 
     </LinearLayout>
 
-    <!-- Menu trượt bên trái -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"
