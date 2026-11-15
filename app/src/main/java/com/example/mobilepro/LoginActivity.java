@@ -1,6 +1,7 @@
 package com.example.mobilepro;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +31,10 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         btnLogin.setOnClickListener(v -> {
+            String username = edtUsername.getText().toString();
+            SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            prefs.edit().putString("username", username).apply();
+
             Intent intent = new Intent(LoginActivity.this, ProductListActivity.class);
             startActivity(intent);
         });

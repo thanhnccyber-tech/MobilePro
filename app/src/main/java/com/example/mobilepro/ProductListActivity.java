@@ -27,12 +27,8 @@ public class ProductListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
-        allProducts.add(new Product("Apple", "30.000đ", "Táo đỏ nhập khẩu, giòn ngọt", R.drawable.apple));
-        allProducts.add(new Product("Banana", "15.000đ", "Chuối chín tự nhiên", R.drawable.apple));
-        allProducts.add(new Product("Cherry", "120.000đ", "Cherry Mỹ, quả to", R.drawable.apple));
-        allProducts.add(new Product("Date", "90.000đ", "Quả chà là khô", R.drawable.apple));
-        allProducts.add(new Product("Grapes", "60.000đ", "Nho xanh không hạt", R.drawable.apple));
-
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        allProducts = dbHelper.getAllProducts();
 
         ListView listView = findViewById(R.id.listView);
         adapter = new ProductAdapter(this, allProducts);
@@ -56,15 +52,17 @@ public class ProductListActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_explore) {
-                // Đang ở màn Khám phá → cuộn về đầu danh sách
                 listView.setSelection(0);
             } else if (id == R.id.nav_home) {
                 Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
             } else if (id == R.id.nav_cart) {
-                Toast.makeText(this, "Giỏ hàng (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProductListActivity.this, CartActivity.class));
+                finish();
             } else if (id == R.id.nav_account) {
-                Toast.makeText(this, "Tài khoản (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProductListActivity.this, ProfileActivity.class));
+                finish();
             } else if (id == R.id.nav_logout) {
+                getSharedPreferences("user_prefs", MODE_PRIVATE).edit().remove("username").apply();
                 Intent intent = new Intent(ProductListActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -87,9 +85,11 @@ public class ProductListActivity extends AppCompatActivity {
             } else if (id == R.id.nav_bottom_home) {
                 Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
             } else if (id == R.id.nav_bottom_cart) {
-                Toast.makeText(this, "Giỏ hàng (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProductListActivity.this, CartActivity.class));
+                finish();
             } else if (id == R.id.nav_bottom_account) {
-                Toast.makeText(this, "Tài khoản (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProductListActivity.this, ProfileActivity.class));
+                finish();
             }
 
             return false;

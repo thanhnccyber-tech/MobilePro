@@ -23,6 +23,10 @@
         <activity android:name=".ProductListActivity" />
 
         <activity android:name=".ProductDetailActivity" />
+
+        <activity android:name=".ProfileActivity" />
+
+        <activity android:name=".CartActivity" />
     </application>
 
 </manifest>

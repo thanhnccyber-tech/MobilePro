@@ -10,13 +10,28 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-        <Button
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="Quay lại"
-            android:backgroundTint="#4B4444"/>
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="Quay lại"
+                android:backgroundTint="#4B4444"/>
+
+            <Button
+                android:id="@+id/btnAddToCart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#33C536"
+                android:text="Thêm vào giỏ hàng" />
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/imgDetail"
