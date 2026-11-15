@@ -7,12 +7,22 @@ public class Product implements Serializable {
     private String price;
     private String description;
     private int imageResId;
+    private int quantity;
 
     public Product(String name, String price, String description, int imageResId) {
         this.name = name;
         this.price = price;
         this.description = description;
         this.imageResId = imageResId;
+        this.quantity = 1;
+    }
+
+    public Product(String name, String price, String description, int imageResId, int quantity) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.imageResId = imageResId;
+        this.quantity = quantity;
     }
 
     public String getName() {
@@ -29,5 +39,12 @@ public class Product implements Serializable {
 
     public int getImageResId() {
         return imageResId;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

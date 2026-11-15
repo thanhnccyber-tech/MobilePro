@@ -96,13 +96,4 @@ public class ProductListActivity extends AppCompatActivity {
         });
     }
 
-    // Bấm back: nếu drawer đang mở thì đóng
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 }

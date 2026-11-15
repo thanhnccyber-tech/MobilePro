@@ -19,19 +19,24 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         TextView tvUsername = findViewById(R.id.tvProfileUsername);
+        Button btnEditInfo = findViewById(R.id.btnEditInfo);
+        Button btnChangePassword = findViewById(R.id.btnChangePassword);
+        Button btnUserGuide = findViewById(R.id.btnUserGuide);
         Button btnLogout = findViewById(R.id.btnLogout);
-        Button btnBack = findViewById(R.id.btnProfileBack);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
 
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
         String username = prefs.getString("username", "");
         tvUsername.setText(username);
 
-        btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(ProfileActivity.this, ProductListActivity.class);
-            startActivity(intent);
-            finish();
-        });
+        btnEditInfo.setOnClickListener(v ->
+                Toast.makeText(this, "Chỉnh sửa thông tin (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
+
+        btnChangePassword.setOnClickListener(v ->
+                Toast.makeText(this, "Đổi mật khẩu (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
+
+        btnUserGuide.setOnClickListener(v ->
+                Toast.makeText(this, "Hướng dẫn sử dụng (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
 
         btnLogout.setOnClickListener(v -> {
             prefs.edit().remove("username").apply();

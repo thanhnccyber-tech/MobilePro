@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="#147A1B"
+            android:background="@color/green"
             android:gravity="center_vertical">
 
             <Button
@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:text="☰"
                 android:textSize="18sp"
-                android:backgroundTint="#147A1B"
+                android:backgroundTint="@color/green"
                 android:textColor="#FFFFFF" />
 
             <TextView
@@ -34,8 +34,16 @@
                 android:text="Giỏ hàng"
                 android:textSize="20sp"
                 android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:gravity="center_vertical" />
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnClearCart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xóa tất cả"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#BF2020" />
         </LinearLayout>
 
         <ListView
@@ -45,13 +53,25 @@
             android:layout_weight="1"
             android:padding="5dp" />
 
-        <Button
-            android:id="@+id/btnClearCart"
+        <TextView
+            android:id="@+id/tvTotalPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:backgroundTint="#BF2020"
-            android:text="Xóa tất cả" />
+            android:padding="12dp"
+            android:text="Tổng tiền: 0đ"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#BD1208" />
+
+        <Button
+            android:id="@+id/btnCheckout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/green"
+            android:text="Thanh toán" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNav"
