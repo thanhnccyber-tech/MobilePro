@@ -15,14 +15,14 @@ public class CartAdapter extends BaseAdapter {
 
     private final Context context;
     private final List<Product> productList;
-    private final DatabaseHelper dbHelper;
+    private final FirebaseCartHelper cartHelper;
     private final Runnable onCartChanged;
 
     public CartAdapter(Context context, List<Product> productList,
-                       DatabaseHelper dbHelper, Runnable onCartChanged) {
+                       FirebaseCartHelper cartHelper, Runnable onCartChanged) {
         this.context = context;
         this.productList = productList;
-        this.dbHelper = dbHelper;
+        this.cartHelper = cartHelper;
         this.onCartChanged = onCartChanged;
     }
 
@@ -57,20 +57,21 @@ public class CartAdapter extends BaseAdapter {
         tvPrice.setText(product.getPrice());
         tvQty.setText(String.valueOf(product.getQuantity()));
 
-        btnPlus.setOnClickListener(v -> {
-            dbHelper.increaseQuantity(product.getName());
-            onCartChanged.run();
-        });
+        btnPlus.setOnClickListener(v ->
+                cartHelper.increaseQuantity(product.getName())
+                        .addOnSuccessListener(unused -> onCartChanged.run()));
+
 
         btnMinus.setOnClickListener(v -> {
-            dbHelper.decreaseQuantity(product.getName());
-            onCartChanged.run();
+            if (product.getQuantity() > 1) {
+                cartHelper.decreaseQuantity(product.getName())
+                        .addOnSuccessListener(unused -> onCartChanged.run());
+            }
         });
 
-        btnDelete.setOnClickListener(v -> {
-            dbHelper.removeFromCart(product.getName());
-            onCartChanged.run();
-        });
+        btnDelete.setOnClickListener(v ->
+                cartHelper.removeFromCart(product.getName())
+                        .addOnSuccessListener(unused -> onCartChanged.run()));
 
         return convertView;
     }

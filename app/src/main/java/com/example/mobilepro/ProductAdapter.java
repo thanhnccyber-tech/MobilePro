@@ -37,7 +37,6 @@ public class ProductAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Tái sử dụng view cũ nếu có
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_product, parent, false);
         }

@@ -12,27 +12,31 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductListActivity extends AppCompatActivity {
 
-    private List<Product> allProducts = new ArrayList<>();
+    private final List<Product> allProducts = new ArrayList<>();
     private ProductAdapter adapter;
     private DrawerLayout drawerLayout;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        allProducts = dbHelper.getAllProducts();
+        db = FirebaseFirestore.getInstance();
 
         ListView listView = findViewById(R.id.listView);
         adapter = new ProductAdapter(this, allProducts);
         listView.setAdapter(adapter);
+
+        loadProductsFromFirestore();
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Product product = allProducts.get(position);
@@ -41,7 +45,6 @@ public class ProductListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Menu trượt bên trái
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
         Button btnMenu = findViewById(R.id.btnMenu);
@@ -72,15 +75,12 @@ public class ProductListActivity extends AppCompatActivity {
             return true;
         });
 
-        // Thanh điều hướng dưới
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        // Mặc định chọn tab "Khám phá"
         bottomNav.setSelectedItemId(R.id.nav_bottom_explore);
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
             if (id == R.id.nav_bottom_explore) {
-                // Đang ở màn hình này, giữ nguyên
                 return true;
             } else if (id == R.id.nav_bottom_home) {
                 Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
@@ -96,4 +96,31 @@ public class ProductListActivity extends AppCompatActivity {
         });
     }
 
+    private void loadProductsFromFirestore() {
+        db.collection("products")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        allProducts.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            String name = document.getString("name");
+                            String price = document.getString("price");
+                            String description = document.getString("description");
+
+                            if (name != null && price != null) {
+                                allProducts.add(new Product(
+                                        name,
+                                        price,
+                                        description != null ? description : "",
+                                        R.drawable.apple
+                                ));
+                            }
+                        }
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        String error = task.getException() != null ? task.getException().getMessage() : "Lỗi kết nối";
+                        Toast.makeText(this, "Lỗi tải dữ liệu: " + error, Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
 }

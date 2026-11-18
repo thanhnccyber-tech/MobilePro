@@ -6,6 +6,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -38,11 +39,16 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvPrice.setText("Giá: " + product.getPrice());
             tvDescription.setText(product.getDescription());
 
-            btnAddToCart.setOnClickListener(v -> {
-                new DatabaseHelper(this).addToCart(product, quantity);
-                startActivity(new Intent(ProductDetailActivity.this, CartActivity.class));
-                finish();
-            });
+            btnAddToCart.setOnClickListener(v ->
+                    new FirebaseCartHelper().addToCart(product, quantity)
+                            .addOnSuccessListener(unused -> {
+                                startActivity(new Intent(ProductDetailActivity.this, CartActivity.class));
+                                finish();
+                            })
+                            .addOnFailureListener(e ->
+                                    Toast.makeText(ProductDetailActivity.this,
+                                            "Lỗi thêm giỏ: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT).show()));
         }
 
         btnMinus.setOnClickListener(v -> {

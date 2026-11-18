@@ -13,6 +13,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class CartActivity extends AppCompatActivity {
     private final List<Product> cartProducts = new ArrayList<>();
     private CartAdapter adapter;
     private DrawerLayout drawerLayout;
-    private DatabaseHelper dbHelper;
+    private FirebaseCartHelper cartHelper;
     private TextView tvTotal;
 
     @Override
@@ -30,13 +31,12 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        dbHelper = new DatabaseHelper(this);
-        cartProducts.addAll(dbHelper.getCartProducts());
+        cartHelper = new FirebaseCartHelper();
 
         ListView listView = findViewById(R.id.listCart);
         tvTotal = findViewById(R.id.tvTotalPrice);
 
-        adapter = new CartAdapter(this, cartProducts, dbHelper, this::refreshCart);
+        adapter = new CartAdapter(this, cartProducts, cartHelper, this::loadCart);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
@@ -47,17 +47,15 @@ public class CartActivity extends AppCompatActivity {
         });
 
         Button btnClear = findViewById(R.id.btnClearCart);
-        btnClear.setOnClickListener(v -> {
-            dbHelper.clearCart();
-            refreshCart();
-            Toast.makeText(this, "Đã xóa giỏ hàng", Toast.LENGTH_SHORT).show();
-        });
+        btnClear.setOnClickListener(v ->
+                cartHelper.clearCart().addOnSuccessListener(unused -> {
+                    loadCart();
+                    Toast.makeText(this, "Đã xóa giỏ hàng", Toast.LENGTH_SHORT).show();
+                }));
 
         Button btnCheckout = findViewById(R.id.btnCheckout);
         btnCheckout.setOnClickListener(v ->
                 Toast.makeText(this, "Thanh toán (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
-
-        updateTotal();
 
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
@@ -86,7 +84,6 @@ public class CartActivity extends AppCompatActivity {
             return true;
         });
 
-
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_bottom_cart);
         bottomNav.setOnItemSelectedListener(item -> {
@@ -104,29 +101,58 @@ public class CartActivity extends AppCompatActivity {
             }
             return false;
         });
+
+        loadCart();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        refreshCart();
+        loadCart();
     }
 
-    private void refreshCart() {
-        cartProducts.clear();
-        cartProducts.addAll(dbHelper.getCartProducts());
-        adapter.notifyDataSetChanged();
-        updateTotal();
+    private void loadCart() {
+        cartHelper.getCart().addOnSuccessListener(snap -> {
+            cartProducts.clear();
+            for (DocumentSnapshot doc : snap.getDocuments()) {
+                String name = doc.getString("name");
+                String price = doc.getString("price");
+                String desc = doc.getString("description");
+                Long img = doc.getLong("imageResId");
+                Long qty = doc.getLong("quantity");
+
+                if (name != null && price != null) {
+                    cartProducts.add(new Product(
+                            name, price,
+                            desc != null ? desc : "",
+                            img != null ? img.intValue() : R.drawable.apple,
+                            qty != null ? qty.intValue() : 1
+                    ));
+                }
+            }
+            adapter.notifyDataSetChanged();
+            updateTotal();
+        }).addOnFailureListener(e ->
+                Toast.makeText(this, "Lỗi tải giỏ: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void updateTotal() {
-        int total = dbHelper.getCartTotal();
+        int total = 0;
+        for (Product p : cartProducts) {
+            total += parsePrice(p.getPrice()) * p.getQuantity();
+        }
         tvTotal.setText("Tổng tiền: " + formatPrice(total));
+    }
+
+    private int parsePrice(String price) {
+        try {
+            return Integer.parseInt(price.replace("đ", "").replace(".", "").trim());
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     private String formatPrice(int price) {
         return String.format("%,d", price).replace(",", ".") + "đ";
     }
-
-
 }
