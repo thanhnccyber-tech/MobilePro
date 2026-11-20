@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">MobilePro</string>
+
+
+    <string name="login_title">Đăng nhập</string>
+    <string name="login_welcome">Chào mừng bạn đến với MobilePro</string>
+    <string name="login_username">Tên đăng nhập</string>
+    <string name="login_password">Mật khẩu</string>
+    <string name="login_button">Đăng nhập</string>
+    <string name="login_go_register">Chưa có tài khoản? Đăng ký</string>
+
+    <string name="register_title">Đăng ký</string>
+    <string name="register_username">Tên đăng nhập</string>
+    <string name="register_password">Mật khẩu</string>
+    <string name="register_confirm_password">Nhập lại mật khẩu</string>
+    <string name="register_button">Đăng ký</string>
+    <string name="register_go_login">Đã có tài khoản? Đăng nhập</string>
+
+
+    <string name="error_username_empty">Vui lòng nhập tên đăng nhập</string>
+    <string name="error_password_empty">Vui lòng nhập mật khẩu</string>
+
+    <string name="error_register_empty">Vui lòng nhập đầy đủ thông tin</string>
+    <string name="error_password_short">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="error_password_not_match">Mật khẩu nhập lại không khớp</string>
+
 </resources>

@@ -40,13 +40,8 @@ public class FirebaseCartHelper {
             if (task.getResult().exists()) {
                 return docRef.update("quantity", FieldValue.increment(quantity));
             }
-            Map<String, Object> data = new HashMap<>();
-            data.put("name", product.getName());
-            data.put("price", product.getPrice());
-            data.put("description", product.getDescription());
-            data.put("imageResId", product.getImageResId());
-            data.put("quantity", quantity);
-            return docRef.set(data);
+            product.setQuantity(quantity);
+            return docRef.set(product);
         });
     }
 

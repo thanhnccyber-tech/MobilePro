@@ -2,7 +2,6 @@ package com.example.mobilepro;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -10,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,9 +47,9 @@ public class ProductListActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
-        Button btnMenu = findViewById(R.id.btnMenu);
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
 
-        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        topAppBar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();

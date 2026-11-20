@@ -9,6 +9,9 @@ public class Product implements Serializable {
     private int imageResId;
     private int quantity;
 
+    public Product() {
+    }
+
     public Product(String name, String price, String description, int imageResId) {
         this.name = name;
         this.price = price;
@@ -39,6 +42,10 @@ public class Product implements Serializable {
 
     public int getImageResId() {
         return imageResId;
+    }
+
+    public void setImageResId(int imageResId) {
+        this.imageResId = imageResId;
     }
 
     public int getQuantity() {

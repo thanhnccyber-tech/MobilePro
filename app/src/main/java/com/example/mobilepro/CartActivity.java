@@ -54,8 +54,13 @@ public class CartActivity extends AppCompatActivity {
                 }));
 
         Button btnCheckout = findViewById(R.id.btnCheckout);
-        btnCheckout.setOnClickListener(v ->
-                Toast.makeText(this, "Thanh toán (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
+        btnCheckout.setOnClickListener(v -> {
+            if (cartProducts.isEmpty()) {
+                Toast.makeText(this, "Giỏ hàng đang trống", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            startActivity(new Intent(CartActivity.this, CheckoutActivity.class));
+        });
 
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
@@ -115,19 +120,12 @@ public class CartActivity extends AppCompatActivity {
         cartHelper.getCart().addOnSuccessListener(snap -> {
             cartProducts.clear();
             for (DocumentSnapshot doc : snap.getDocuments()) {
-                String name = doc.getString("name");
-                String price = doc.getString("price");
-                String desc = doc.getString("description");
-                Long img = doc.getLong("imageResId");
-                Long qty = doc.getLong("quantity");
-
-                if (name != null && price != null) {
-                    cartProducts.add(new Product(
-                            name, price,
-                            desc != null ? desc : "",
-                            img != null ? img.intValue() : R.drawable.apple,
-                            qty != null ? qty.intValue() : 1
-                    ));
+                Product product = doc.toObject(Product.class);
+                if (product != null) {
+                    if (product.getImageResId() == 0) {
+                        product.setImageResId(R.drawable.apple);
+                    }
+                    cartProducts.add(product);
                 }
             }
             adapter.notifyDataSetChanged();

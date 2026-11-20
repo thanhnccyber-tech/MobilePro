@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cream"
     android:orientation="vertical">
 
     <LinearLayout
@@ -14,38 +15,41 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:background="@drawable/bg_profile_header"
             android:gravity="center_horizontal"
-            android:paddingTop="20dp"
-            android:paddingBottom="24dp">
+            android:orientation="vertical"
+            android:paddingTop="24dp"
+            android:paddingBottom="28dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="Thông tin tài khoản"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgAvatar"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_width="115dp"
+                android:layout_height="115dp"
                 android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_avatar_circle"
+                android:padding="2dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/logoute"
-                android:background="@drawable/bg_avatar_circle"
-                android:clipToOutline="true" />
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                app:strokeColor="@color/caramel"
+                app:strokeWidth="2dp" />
 
             <TextView
                 android:id="@+id/tvProfileUsername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -54,45 +58,72 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:background="@color/white"
             android:padding="20dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEditInfo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginBottom="12dp"
-                android:backgroundTint="@color/green"
-                android:text="Chỉnh sửa thông tin" />
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Chỉnh sửa thông tin"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/brown"
+                app:cornerRadius="24dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnChangePassword"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:layout_marginBottom="12dp"
-                android:backgroundTint="@color/green"
-                android:text="Đổi mật khẩu" />
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Đổi mật khẩu"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/caramel"
+                app:cornerRadius="24dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnUserGuide"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 android:text="Hướng dẫn sử dụng"
-                android:backgroundTint="@color/gray" />
+                android:textColor="@color/brown"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="24dp"
+                app:strokeColor="@color/cream_border"
+                app:strokeWidth="1.5dp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="46dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp"
-                android:backgroundTint="@color/red"
-                android:text="Đăng xuất" />
+                android:layout_marginBottom="12dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingHorizontal="36dp"
+                android:text="Đăng xuất"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/red"
+                app:cornerRadius="23dp" />
 
         </LinearLayout>
 
@@ -102,6 +133,10 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:itemActiveIndicatorStyle="@null"
+        app:itemIconTint="@color/caramel"
+        app:itemTextColor="@color/brown"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />
 

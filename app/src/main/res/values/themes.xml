@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.MobilePro" parent="Base.Theme.MobilePro" />
+
+    <style name="ToolbarTitleBold" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

@@ -2,18 +2,22 @@ package com.example.mobilepro;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    Button btnRegister, btnGoToLogin;
-    EditText edtUsername, edtPassword, edtConfirmPassword;
+    private MaterialButton btnRegister;
+    private TextView tvGoToLogin;
+    private TextInputLayout tilUsername, tilPassword, tilConfirmPassword;
+    private TextInputEditText edtUsername, edtPassword, edtConfirmPassword;
     private FirebaseAuth mAuth;
 
     @Override
@@ -24,7 +28,10 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         btnRegister = findViewById(R.id.btnRegister);
-        btnGoToLogin = findViewById(R.id.btnGoToLogin);
+        tvGoToLogin = findViewById(R.id.tvGoToLogin);
+        tilUsername = findViewById(R.id.tilRegisterUsername);
+        tilPassword = findViewById(R.id.tilRegisterPassword);
+        tilConfirmPassword = findViewById(R.id.tilRegisterConfirmPassword);
         edtUsername = findViewById(R.id.edtRegisterUsername);
         edtPassword = findViewById(R.id.edtRegisterPassword);
         edtConfirmPassword = findViewById(R.id.edtRegisterConfirmPassword);
@@ -35,20 +42,28 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         btnRegister.setOnClickListener(v -> {
-            String email = edtUsername.getText().toString().trim();
-            String password = edtPassword.getText().toString().trim();
-            String confirmPassword = edtConfirmPassword.getText().toString().trim();
+            tilUsername.setError(null);
+            tilPassword.setError(null);
+            tilConfirmPassword.setError(null);
 
-            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            String email = edtUsername.getText() != null ? edtUsername.getText().toString().trim() : "";
+            String password = edtPassword.getText() != null ? edtPassword.getText().toString().trim() : "";
+            String confirmPassword = edtConfirmPassword.getText() != null ? edtConfirmPassword.getText().toString().trim() : "";
+
+            if (email.isEmpty()) {
+                tilUsername.setError(getString(R.string.error_username_empty));
+                return;
+            }
+            if (password.isEmpty()) {
+                tilPassword.setError(getString(R.string.error_password_empty));
                 return;
             }
             if (password.length() < 6) {
-                Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
+                tilPassword.setError(getString(R.string.error_password_short));
                 return;
             }
             if (!password.equals(confirmPassword)) {
-                Toast.makeText(this, "Mật khẩu nhập lại không khớp", Toast.LENGTH_SHORT).show();
+                tilConfirmPassword.setError(getString(R.string.error_password_not_match));
                 return;
             }
 
@@ -67,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity {
                     });
         });
 
-        btnGoToLogin.setOnClickListener(v -> {
+        tvGoToLogin.setOnClickListener(v -> {
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();

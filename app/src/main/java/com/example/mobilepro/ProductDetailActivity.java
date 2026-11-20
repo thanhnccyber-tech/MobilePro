@@ -2,13 +2,14 @@ package com.example.mobilepro;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.button.MaterialButton;
 
 public class ProductDetailActivity extends AppCompatActivity {
 
@@ -20,19 +21,27 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
         ImageView imgDetail = findViewById(R.id.imgDetail);
         TextView tvName = findViewById(R.id.tvDetailName);
         TextView tvPrice = findViewById(R.id.tvDetailPrice);
         TextView tvDescription = findViewById(R.id.tvDetailDescription);
-        Button btnBack = findViewById(R.id.btnBack);
-        ImageButton btnGoToCart = findViewById(R.id.btnGoToCart);
-        Button btnAddToCart = findViewById(R.id.btnAddToCart);
-        Button btnMinus = findViewById(R.id.btnMinus);
-        Button btnPlus = findViewById(R.id.btnPlus);
+        MaterialButton btnAddToCart = findViewById(R.id.btnAddToCart);
+        MaterialButton btnMinus = findViewById(R.id.btnMinus);
+        MaterialButton btnPlus = findViewById(R.id.btnPlus);
         tvQuantity = findViewById(R.id.tvQuantity);
 
-        Product product = (Product) getIntent().getSerializableExtra("product");
+        topAppBar.setNavigationOnClickListener(v -> finish());
+        topAppBar.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == R.id.action_cart) {
+                startActivity(new Intent(ProductDetailActivity.this, CartActivity.class));
+                finish();
+                return true;
+            }
+            return false;
+        });
 
+        Product product = (Product) getIntent().getSerializableExtra("product");
         if (product != null) {
             imgDetail.setImageResource(product.getImageResId());
             tvName.setText(product.getName());
@@ -62,12 +71,5 @@ public class ProductDetailActivity extends AppCompatActivity {
             quantity++;
             tvQuantity.setText(String.valueOf(quantity));
         });
-
-        btnGoToCart.setOnClickListener(v -> {
-            startActivity(new Intent(ProductDetailActivity.this, CartActivity.class));
-            finish();
-        });
-
-        btnBack.setOnClickListener(v -> finish());
     }
 }
