@@ -2,6 +2,8 @@ package com.example.mobilepro;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -11,7 +13,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -21,9 +26,14 @@ import java.util.List;
 public class ProductListActivity extends AppCompatActivity {
 
     private final List<Product> allProducts = new ArrayList<>();
+    private final List<Product> filteredProducts = new ArrayList<>();
     private ProductAdapter adapter;
     private DrawerLayout drawerLayout;
     private FirebaseFirestore db;
+    private ChipGroup chipGroupCategory;
+
+    private String selectedCategory = "Tất cả";
+    private String searchKeyword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +43,15 @@ public class ProductListActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         ListView listView = findViewById(R.id.listView);
-        adapter = new ProductAdapter(this, allProducts);
+        adapter = new ProductAdapter(this, filteredProducts);
         listView.setAdapter(adapter);
 
+        setupSearchAndFilter();
+        loadCategoriesFromFirestore();
         loadProductsFromFirestore();
 
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            Product product = allProducts.get(position);
+            Product product = filteredProducts.get(position);
             Intent intent = new Intent(ProductListActivity.this, ProductDetailActivity.class);
             intent.putExtra("product", product);
             startActivity(intent);
@@ -96,31 +108,98 @@ public class ProductListActivity extends AppCompatActivity {
         });
     }
 
+    private void setupSearchAndFilter() {
+        TextInputEditText edtSearch = findViewById(R.id.edtSearch);
+        chipGroupCategory = findViewById(R.id.chipGroupCategory);
+
+        String intentCategory = getIntent().getStringExtra("selectedCategory");
+        if (intentCategory != null && !intentCategory.isEmpty()) {
+            selectedCategory = intentCategory;
+        }
+
+        if (getIntent().getBooleanExtra("focusSearch", false)) {
+            edtSearch.requestFocus();
+        }
+
+        chipGroupCategory.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (!checkedIds.isEmpty()) {
+                Chip chip = findViewById(checkedIds.get(0));
+                if (chip != null) {
+                    selectedCategory = chip.getText().toString();
+                    filterProducts();
+                }
+            }
+        });
+
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchKeyword = s != null ? s.toString().trim().toLowerCase() : "";
+                filterProducts();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void loadCategoriesFromFirestore() {
+        db.collection("categories")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    chipGroupCategory.removeAllViews();
+                    addCategoryChip("Tất cả", selectedCategory.equalsIgnoreCase("Tất cả"));
+
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        String name = doc.getString("name");
+                        if (name != null && !name.isEmpty()) {
+                            addCategoryChip(name, selectedCategory.equalsIgnoreCase(name));
+                        }
+                    }
+                });
+    }
+
+    private void addCategoryChip(String title, boolean isChecked) {
+        Chip chip = new Chip(this, null, com.google.android.material.R.attr.chipStyle);
+        chip.setText(title);
+        chip.setCheckable(true);
+        chip.setChecked(isChecked);
+        chipGroupCategory.addView(chip);
+    }
+
     private void loadProductsFromFirestore() {
         db.collection("products")
                 .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        allProducts.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            String name = document.getString("name");
-                            Long priceLong = document.getLong("price");
-                            String description = document.getString("description");
-
-                            if (name != null && priceLong != null) {
-                                allProducts.add(new Product(
-                                        name,
-                                        priceLong.intValue(),
-                                        description != null ? description : "",
-                                        R.drawable.apple
-                                ));
-                            }
-                        }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        String error = task.getException() != null ? task.getException().getMessage() : "Lỗi kết nối";
-                        Toast.makeText(this, "Lỗi tải dữ liệu: " + error, Toast.LENGTH_LONG).show();
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    allProducts.clear();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Product product = document.toObject(Product.class);
+                        if (product.getImageResId() == 0) product.setImageResId(R.drawable.apple);
+                        if (product.getCategory() == null) product.setCategory("Khác");
+                        allProducts.add(product);
                     }
-                });
+                    filterProducts();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_LONG).show());
+    }
+
+    private void filterProducts() {
+        filteredProducts.clear();
+        for (Product product : allProducts) {
+            boolean matchCategory = selectedCategory.equalsIgnoreCase("Tất cả")
+                    || (product.getCategory() != null && product.getCategory().equalsIgnoreCase(selectedCategory));
+
+            boolean matchKeyword = searchKeyword.isEmpty()
+                    || (product.getName() != null && product.getName().toLowerCase().contains(searchKeyword));
+
+            if (matchCategory && matchKeyword) {
+                filteredProducts.add(product);
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 }
