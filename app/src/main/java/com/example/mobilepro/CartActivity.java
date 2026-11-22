@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -46,13 +47,6 @@ public class CartActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        Button btnClear = findViewById(R.id.btnClearCart);
-        btnClear.setOnClickListener(v ->
-                cartHelper.clearCart().addOnSuccessListener(unused -> {
-                    loadCart();
-                    Toast.makeText(this, "Đã xóa giỏ hàng", Toast.LENGTH_SHORT).show();
-                }));
-
         Button btnCheckout = findViewById(R.id.btnCheckout);
         btnCheckout.setOnClickListener(v -> {
             if (cartProducts.isEmpty()) {
@@ -64,8 +58,16 @@ public class CartActivity extends AppCompatActivity {
 
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
-        Button btnMenu = findViewById(R.id.btnMenu);
-        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
+
+        topAppBar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+
+        Button btnClear = findViewById(R.id.btnClearCart);
+        btnClear.setOnClickListener(v ->
+                cartHelper.clearCart().addOnSuccessListener(unused -> {
+                    loadCart();
+                    Toast.makeText(this, "Đã xóa giỏ hàng", Toast.LENGTH_SHORT).show();
+                }));
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();

@@ -145,44 +145,19 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private void submitOrder(String fullName, String phone, String address,
                              String note, String paymentMethod) {
-        int subtotal = getSubtotal();
-        int total = subtotal + SHIPPING_FEE;
-
         String uid = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "";
 
-        // Chuẩn bị danh sách món (Map để tránh phụ thuộc vào setter của Product)
-        List<Map<String, Object>> items = new ArrayList<>();
-        for (Product p : cartProducts) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("name", p.getName());
-            item.put("price", p.getPrice());
-            item.put("quantity", p.getQuantity());
-            items.add(item);
-        }
-
-        Map<String, Object> order = new HashMap<>();
-        order.put("userId", uid);
-        order.put("fullName", fullName);
-        order.put("phone", phone);
-        order.put("address", address);
-        order.put("note", note);
-        order.put("paymentMethod", paymentMethod);
-        order.put("items", items);
-        order.put("subtotal", subtotal);
-        order.put("shippingFee", SHIPPING_FEE);
-        order.put("total", total);
-        order.put("createdAt", FieldValue.serverTimestamp());
+        Order order = new Order(uid, fullName, phone, address, note,
+                paymentMethod, cartProducts, getSubtotal(), SHIPPING_FEE);
 
         FirebaseFirestore.getInstance().collection("orders").add(order)
-                .addOnSuccessListener(ref -> cartHelper.clearCart()
-                        .addOnSuccessListener(unused -> {
-                            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-                            finish();
-                        }))
+                .addOnSuccessListener(ref -> cartHelper.clearCart().addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+                    finish();
+                }))
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Đặt hàng thất bại: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "Đặt hàng thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private int getSubtotal() {
