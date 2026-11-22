@@ -104,13 +104,13 @@ public class ProductListActivity extends AppCompatActivity {
                         allProducts.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             String name = document.getString("name");
-                            String price = document.getString("price");
+                            Long priceLong = document.getLong("price");
                             String description = document.getString("description");
 
-                            if (name != null && price != null) {
+                            if (name != null && priceLong != null) {
                                 allProducts.add(new Product(
                                         name,
-                                        price,
+                                        priceLong.intValue(),
                                         description != null ? description : "",
                                         R.drawable.apple
                                 ));

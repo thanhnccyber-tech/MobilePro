@@ -50,7 +50,7 @@ public class ProductAdapter extends BaseAdapter {
 
         imgProduct.setImageResource(product.getImageResId());
         tvName.setText(product.getName());
-        tvPrice.setText("Giá: " + product.getPrice());
+        tvPrice.setText("Giá: " + Product.formatPrice(product.getPrice()));
         tvDescription.setText(product.getDescription());
 
         return convertView;

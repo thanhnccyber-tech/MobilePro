@@ -53,7 +53,9 @@ public class CartActivity extends AppCompatActivity {
                 Toast.makeText(this, "Giỏ hàng đang trống", Toast.LENGTH_SHORT).show();
                 return;
             }
-            startActivity(new Intent(CartActivity.this, CheckoutActivity.class));
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            intent.putExtra("cartProducts", new ArrayList<>(cartProducts));
+            startActivity(intent);
         });
 
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -139,20 +141,9 @@ public class CartActivity extends AppCompatActivity {
     private void updateTotal() {
         int total = 0;
         for (Product p : cartProducts) {
-            total += parsePrice(p.getPrice()) * p.getQuantity();
+            total += p.getPrice() * p.getQuantity();
         }
-        tvTotal.setText("Tổng tiền: " + formatPrice(total));
+        tvTotal.setText("Tổng tiền: " + Product.formatPrice(total));
     }
 
-    private int parsePrice(String price) {
-        try {
-            return Integer.parseInt(price.replace("đ", "").replace(".", "").trim());
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    private String formatPrice(int price) {
-        return String.format("%,d", price).replace(",", ".") + "đ";
-    }
 }

@@ -54,7 +54,7 @@ public class CartAdapter extends BaseAdapter {
 
         img.setImageResource(product.getImageResId());
         tvName.setText(product.getName());
-        tvPrice.setText(product.getPrice());
+        tvPrice.setText(Product.formatPrice(product.getPrice()));
         tvQty.setText(String.valueOf(product.getQuantity()));
 
         btnPlus.setOnClickListener(v ->

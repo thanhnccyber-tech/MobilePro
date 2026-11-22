@@ -32,20 +32,16 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvQuantity = findViewById(R.id.tvQuantity);
 
         topAppBar.setNavigationOnClickListener(v -> finish());
-        topAppBar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.action_cart) {
-                startActivity(new Intent(ProductDetailActivity.this, CartActivity.class));
-                finish();
-                return true;
-            }
-            return false;
+        findViewById(R.id.btnCart).setOnClickListener(v -> {
+            startActivity(new Intent(ProductDetailActivity.this, CartActivity.class));
+            finish();
         });
 
         Product product = (Product) getIntent().getSerializableExtra("product");
         if (product != null) {
             imgDetail.setImageResource(product.getImageResId());
             tvName.setText(product.getName());
-            tvPrice.setText("Giá: " + product.getPrice());
+            tvPrice.setText("Giá: " + Product.formatPrice(product.getPrice()));
             tvDescription.setText(product.getDescription());
 
             btnAddToCart.setOnClickListener(v ->

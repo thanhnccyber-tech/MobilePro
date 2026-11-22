@@ -63,22 +63,12 @@ public class CheckoutActivity extends AppCompatActivity {
         MaterialButton btnPlaceOrder = findViewById(R.id.btnPlaceOrder);
         btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
 
-        loadOrderSummary();
-    }
-
-    private void loadOrderSummary() {
-        cartHelper.getCart().addOnSuccessListener(snap -> {
-            cartProducts.clear();
-            for (DocumentSnapshot doc : snap.getDocuments()) {
-                Product product = doc.toObject(Product.class);
-                if (product != null) {
-                    cartProducts.add(product);
-                }
-            }
-            renderOrderItems();
-            updateTotals();
-        }).addOnFailureListener(e ->
-                Toast.makeText(this, "Lỗi tải giỏ hàng: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        ArrayList<Product> list = (ArrayList<Product>) getIntent().getSerializableExtra("cartProducts");
+        if (list != null) {
+            cartProducts.addAll(list);
+        }
+        renderOrderItems();
+        updateTotals();
     }
 
     private void renderOrderItems() {
@@ -90,10 +80,10 @@ public class CheckoutActivity extends AppCompatActivity {
             TextView tvQty = row.findViewById(R.id.tvItemQty);
             TextView tvPrice = row.findViewById(R.id.tvItemPrice);
 
-            int lineTotal = parsePrice(p.getPrice()) * p.getQuantity();
+            int lineTotal = p.getPrice() * p.getQuantity();
             tvName.setText(p.getName());
             tvQty.setText("x" + p.getQuantity());
-            tvPrice.setText(formatPrice(lineTotal));
+            tvPrice.setText(Product.formatPrice(lineTotal));
             layoutOrderItems.addView(row);
         }
     }
@@ -101,9 +91,9 @@ public class CheckoutActivity extends AppCompatActivity {
     private void updateTotals() {
         int subtotal = getSubtotal();
         int shipping = subtotal > 0 ? SHIPPING_FEE : 0;
-        tvSubtotal.setText(formatPrice(subtotal));
-        tvShipping.setText(formatPrice(shipping));
-        tvTotal.setText(formatPrice(subtotal + shipping));
+        tvSubtotal.setText(Product.formatPrice(subtotal));
+        tvShipping.setText(Product.formatPrice(shipping));
+        tvTotal.setText(Product.formatPrice(subtotal + shipping));
     }
 
     private void handlePlaceOrder() {
@@ -163,20 +153,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private int getSubtotal() {
         int subtotal = 0;
         for (Product p : cartProducts) {
-            subtotal += parsePrice(p.getPrice()) * p.getQuantity();
+            subtotal += p.getPrice() * p.getQuantity();
         }
         return subtotal;
-    }
-
-    private int parsePrice(String price) {
-        try {
-            return Integer.parseInt(price.replace("đ", "").replace(".", "").trim());
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    private String formatPrice(int price) {
-        return String.format("%,d", price).replace(",", ".") + "đ";
     }
 }
