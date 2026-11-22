@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                             prefs.edit().putString("username", email).apply();
 
                             Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, ProductListActivity.class);
+                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                             startActivity(intent);
                             finish();
                         } else {

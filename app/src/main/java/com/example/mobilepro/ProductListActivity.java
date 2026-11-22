@@ -69,7 +69,8 @@ public class ProductListActivity extends AppCompatActivity {
             if (id == R.id.nav_explore) {
                 listView.setSelection(0);
             } else if (id == R.id.nav_home) {
-                Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProductListActivity.this, HomeActivity.class));
+                finish();
             } else if (id == R.id.nav_cart) {
                 startActivity(new Intent(ProductListActivity.this, CartActivity.class));
                 finish();
@@ -95,7 +96,8 @@ public class ProductListActivity extends AppCompatActivity {
             if (id == R.id.nav_bottom_explore) {
                 return true;
             } else if (id == R.id.nav_bottom_home) {
-                Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProductListActivity.this, HomeActivity.class));
+                finish();
             } else if (id == R.id.nav_bottom_cart) {
                 startActivity(new Intent(ProductListActivity.this, CartActivity.class));
                 finish();

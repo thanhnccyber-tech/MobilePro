@@ -77,7 +77,8 @@ public class CartActivity extends AppCompatActivity {
                 startActivity(new Intent(CartActivity.this, ProductListActivity.class));
                 finish();
             } else if (id == R.id.nav_home) {
-                Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(CartActivity.this, HomeActivity.class));
+                finish();
             } else if (id == R.id.nav_cart) {
 
             } else if (id == R.id.nav_account) {
@@ -103,7 +104,8 @@ public class CartActivity extends AppCompatActivity {
                 startActivity(new Intent(CartActivity.this, ProductListActivity.class));
                 finish();
             } else if (id == R.id.nav_bottom_home) {
-                Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(CartActivity.this, HomeActivity.class));
+                finish();
             } else if (id == R.id.nav_bottom_account) {
                 startActivity(new Intent(CartActivity.this, ProfileActivity.class));
                 finish();

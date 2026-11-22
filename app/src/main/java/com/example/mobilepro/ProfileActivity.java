@@ -55,7 +55,8 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(new Intent(ProfileActivity.this, ProductListActivity.class));
                 finish();
             } else if (id == R.id.nav_bottom_home) {
-                Toast.makeText(this, "Trang chủ (chưa gán chức năng)", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
+                finish();
             } else if (id == R.id.nav_bottom_cart) {
                 startActivity(new Intent(ProfileActivity.this, CartActivity.class));
                 finish();
