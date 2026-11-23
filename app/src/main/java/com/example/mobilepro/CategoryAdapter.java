@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class CategoryAdapter extends BaseAdapter {
@@ -40,7 +42,7 @@ public class CategoryAdapter extends BaseAdapter {
         ImageView imgCategory = convertView.findViewById(R.id.imgCategory);
         TextView tvName = convertView.findViewById(R.id.tvCategoryName);
 
-        imgCategory.setImageResource(category.getImageResId());
+        ImageLoader.loadCategory(imgCategory, category);
         tvName.setText(category.getName());
 
         return convertView;

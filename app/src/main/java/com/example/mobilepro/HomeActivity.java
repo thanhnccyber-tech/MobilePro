@@ -115,7 +115,6 @@ public class HomeActivity extends AppCompatActivity {
             for (DocumentSnapshot doc : snap) {
                 Category category = doc.toObject(Category.class);
                 if (category != null) {
-                    if (category.getImageResId() == 0) category.setImageResId(R.drawable.banhkem);
                     categoryList.add(category);
                 }
             }
@@ -146,7 +145,7 @@ public class HomeActivity extends AppCompatActivity {
             for (DocumentSnapshot doc : snap) {
                 Product product = doc.toObject(Product.class);
                 if (product != null) {
-                    if (product.getImageResId() == 0) product.setImageResId(R.drawable.apple);
+                    if (product.getImageResId() == 0) product.setImageResId(R.drawable.banhkem);
                     featuredProducts.add(product);
                 }
             }

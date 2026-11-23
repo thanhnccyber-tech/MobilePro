@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class CartAdapter extends BaseAdapter {
@@ -52,7 +54,7 @@ public class CartAdapter extends BaseAdapter {
         Button btnPlus = convertView.findViewById(R.id.btnPlus);
         Button btnDelete = convertView.findViewById(R.id.btnDeleteItem);
 
-        img.setImageResource(product.getImageResId());
+        ImageLoader.loadProduct(img, product);
         tvName.setText(product.getName());
         tvPrice.setText(Product.formatPrice(product.getPrice()));
         tvQty.setText(String.valueOf(product.getQuantity()));

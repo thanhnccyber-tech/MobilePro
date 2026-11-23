@@ -129,7 +129,7 @@ public class CartActivity extends AppCompatActivity {
                 Product product = doc.toObject(Product.class);
                 if (product != null) {
                     if (product.getImageResId() == 0) {
-                        product.setImageResId(R.drawable.apple);
+                        product.setImageResId(R.drawable.banhkem);
                     }
                     cartProducts.add(product);
                 }

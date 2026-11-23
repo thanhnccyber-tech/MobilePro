@@ -179,7 +179,7 @@ public class ProductListActivity extends AppCompatActivity {
                     allProducts.clear();
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Product product = document.toObject(Product.class);
-                        if (product.getImageResId() == 0) product.setImageResId(R.drawable.apple);
+                        if (product.getImageResId() == 0) product.setImageResId(R.drawable.banhkem);
                         if (product.getCategory() == null) product.setCategory("Khác");
                         allProducts.add(product);
                     }

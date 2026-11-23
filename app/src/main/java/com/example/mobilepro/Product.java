@@ -9,6 +9,7 @@ public class Product implements Serializable {
     private String category;
     private int imageResId;
     private int quantity;
+    private String imageUrl;
 
     public Product() {
     }
@@ -45,6 +46,8 @@ public class Product implements Serializable {
     public void setImageResId(int imageResId) { this.imageResId = imageResId; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public static String formatPrice(int price) {
         return String.format("%,d", price).replace(",", ".") + "đ";

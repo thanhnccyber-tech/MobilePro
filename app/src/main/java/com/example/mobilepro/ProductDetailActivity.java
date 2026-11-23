@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 
@@ -39,7 +40,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         Product product = (Product) getIntent().getSerializableExtra("product");
         if (product != null) {
-            imgDetail.setImageResource(product.getImageResId());
+            ImageLoader.loadProduct(imgDetail, product);
             tvName.setText(product.getName());
             tvPrice.setText("Giá: " + Product.formatPrice(product.getPrice()));
             tvDescription.setText(product.getDescription());
