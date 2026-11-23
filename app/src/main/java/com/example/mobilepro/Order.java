@@ -1,12 +1,21 @@
 package com.example.mobilepro;
 
+import android.graphics.drawable.GradientDrawable;
+import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
+
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.ServerTimestamp;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class Order {
+public class Order implements Serializable {
 
+    public static final String STATUS_ALL = "Tất cả";
     public static final String STATUS_PENDING = "Chờ xác nhận";
     public static final String STATUS_BAKING = "Đang làm bánh";
     public static final String STATUS_SHIPPING = "Đang giao hàng";
@@ -14,7 +23,6 @@ public class Order {
     public static final String STATUS_CANCELLED = "Đã hủy";
     public static final String STATUS_REFUND = "Khiếu nại / Hoàn tiền";
 
-    public static final String STATUS_ALL = "Tất cả";
     public static final String[] ALL_STATUSES = {
             STATUS_ALL, STATUS_PENDING, STATUS_BAKING, STATUS_SHIPPING,
             STATUS_COMPLETED, STATUS_CANCELLED, STATUS_REFUND
@@ -29,6 +37,9 @@ public class Order {
         if (STATUS_REFUND.equals(status)) return R.color.gray;
         return R.color.brown_light;
     }
+
+    @Exclude
+    public String documentId;
 
     public String userId, fullName, phone, address, note, paymentMethod, orderCode, status;
     public List<Product> items;
@@ -53,5 +64,15 @@ public class Order {
         this.total = subtotal + shippingFee;
         this.orderCode = "BKR_" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         this.status = STATUS_PENDING;
+    }
+
+    public static void bindStatusBadge(TextView tv, String status) {
+        int color = ContextCompat.getColor(tv.getContext(), getStatusColorRes(status));
+        GradientDrawable badge = new GradientDrawable();
+        badge.setCornerRadius(tv.getResources().getDisplayMetrics().density * 8);
+        badge.setColor(ColorUtils.setAlphaComponent(color, 38));
+        tv.setText(status);
+        tv.setTextColor(color);
+        tv.setBackground(badge);
     }
 }

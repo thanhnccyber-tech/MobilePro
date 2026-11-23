@@ -1,15 +1,11 @@
 package com.example.mobilepro;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.ColorUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -52,12 +48,7 @@ public class OrderHistoryAdapter extends BaseAdapter {
         tvItems.setText(buildItemSummary(order));
         tvTotal.setText(Product.formatPrice(order.total));
 
-        int statusColor = ContextCompat.getColor(context, Order.getStatusColorRes(order.status));
-        GradientDrawable badge = new GradientDrawable();
-        badge.setCornerRadius(context.getResources().getDisplayMetrics().density * 8);
-        badge.setColor(ColorUtils.setAlphaComponent(statusColor, 38));
-        tvStatus.setBackground(badge);
-        tvStatus.setTextColor(statusColor);
+        Order.bindStatusBadge(tvStatus, order.status);
 
         return convertView;
     }

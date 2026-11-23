@@ -1,5 +1,6 @@
 package com.example.mobilepro;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -32,8 +33,9 @@ public class OrderHistoryActivity extends AppCompatActivity {
         ((MaterialToolbar) findViewById(R.id.topAppBar)).setNavigationOnClickListener(v -> finish());
 
         tabLayout = findViewById(R.id.tabLayout);
+        ListView listOrders = findViewById(R.id.listOrders);
         adapter = new OrderHistoryAdapter(this, filteredOrders);
-        ((ListView) findViewById(R.id.listOrders)).setAdapter(adapter);
+        listOrders.setAdapter(adapter);
 
         for (String status : Order.ALL_STATUSES) {
             tabLayout.addTab(tabLayout.newTab().setText(status));
@@ -47,6 +49,16 @@ public class OrderHistoryActivity extends AppCompatActivity {
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
 
+        listOrders.setOnItemClickListener((parent, view, position, id) -> {
+            Intent intent = new Intent(this, OrderDetailActivity.class);
+            intent.putExtra("order", filteredOrders.get(position));
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadOrders();
     }
 
@@ -64,7 +76,10 @@ public class OrderHistoryActivity extends AppCompatActivity {
                     allOrders.clear();
                     for (DocumentSnapshot doc : snap) {
                         Order order = doc.toObject(Order.class);
-                        if (order != null) allOrders.add(order);
+                        if (order != null) {
+                            order.documentId = doc.getId();
+                            allOrders.add(order);
+                        }
                     }
                     allOrders.sort(Comparator.comparing(o -> o.createdAt, Comparator.nullsLast(Comparator.reverseOrder())));
                     filterOrders(Order.ALL_STATUSES[Math.max(0, tabLayout.getSelectedTabPosition())]);
