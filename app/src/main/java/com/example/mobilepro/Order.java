@@ -3,9 +3,34 @@ package com.example.mobilepro;
 import com.google.firebase.firestore.ServerTimestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class Order {
-    public String userId, fullName, phone, address, note, paymentMethod;
+
+    public static final String STATUS_PENDING = "Chờ xác nhận";
+    public static final String STATUS_BAKING = "Đang làm bánh";
+    public static final String STATUS_SHIPPING = "Đang giao hàng";
+    public static final String STATUS_COMPLETED = "Hoàn thành";
+    public static final String STATUS_CANCELLED = "Đã hủy";
+    public static final String STATUS_REFUND = "Khiếu nại / Hoàn tiền";
+
+    public static final String STATUS_ALL = "Tất cả";
+    public static final String[] ALL_STATUSES = {
+            STATUS_ALL, STATUS_PENDING, STATUS_BAKING, STATUS_SHIPPING,
+            STATUS_COMPLETED, STATUS_CANCELLED, STATUS_REFUND
+    };
+
+    public static int getStatusColorRes(String status) {
+        if (STATUS_PENDING.equals(status)) return R.color.caramel;
+        if (STATUS_BAKING.equals(status)) return R.color.blue;
+        if (STATUS_SHIPPING.equals(status)) return R.color.brown_soft;
+        if (STATUS_COMPLETED.equals(status)) return R.color.green;
+        if (STATUS_CANCELLED.equals(status)) return R.color.red;
+        if (STATUS_REFUND.equals(status)) return R.color.gray;
+        return R.color.brown_light;
+    }
+
+    public String userId, fullName, phone, address, note, paymentMethod, orderCode, status;
     public List<Product> items;
     public int subtotal, shippingFee, total;
     @ServerTimestamp
@@ -26,5 +51,7 @@ public class Order {
         this.subtotal = subtotal;
         this.shippingFee = shippingFee;
         this.total = subtotal + shippingFee;
+        this.orderCode = "BKR_" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        this.status = STATUS_PENDING;
     }
 }
