@@ -103,6 +103,20 @@
                 app:cornerRadius="24dp" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddresses"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="12dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="Sổ địa chỉ"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/brown_soft"
+                app:cornerRadius="24dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"

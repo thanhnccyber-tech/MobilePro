@@ -1,13 +1,17 @@
 package com.example.mobilepro;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -15,14 +19,10 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CheckoutActivity extends AppCompatActivity {
 
@@ -30,12 +30,26 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private final List<Product> cartProducts = new ArrayList<>();
     private FirebaseCartHelper cartHelper;
+    private FirebaseAddressHelper addressHelper;
 
     private TextInputLayout tilFullName, tilPhone, tilAddress;
     private TextInputEditText edtFullName, edtPhone, edtAddress, edtNote;
+    private CheckBox cbSaveAddress;
     private LinearLayout layoutOrderItems;
     private RadioGroup rgPayment;
     private TextView tvSubtotal, tvShipping, tvTotal;
+
+    private final ActivityResultLauncher<Intent> selectAddressLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Address selected = (Address) result.getData().getSerializableExtra("selectedAddress");
+                    if (selected != null) {
+                        fillAddressFields(selected);
+                        cbSaveAddress.setVisibility(View.GONE);
+                        cbSaveAddress.setChecked(false);
+                    }
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +57,7 @@ public class CheckoutActivity extends AppCompatActivity {
         setContentView(R.layout.activity_checkout);
 
         cartHelper = new FirebaseCartHelper();
+        addressHelper = new FirebaseAddressHelper();
 
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
         topAppBar.setNavigationOnClickListener(v -> finish());
@@ -54,11 +69,18 @@ public class CheckoutActivity extends AppCompatActivity {
         edtPhone = findViewById(R.id.edtPhone);
         edtAddress = findViewById(R.id.edtAddress);
         edtNote = findViewById(R.id.edtNote);
+        cbSaveAddress = findViewById(R.id.cbSaveAddress);
         layoutOrderItems = findViewById(R.id.layoutOrderItems);
         rgPayment = findViewById(R.id.rgPayment);
         tvSubtotal = findViewById(R.id.tvSubtotal);
         tvShipping = findViewById(R.id.tvShipping);
         tvTotal = findViewById(R.id.tvTotal);
+
+        findViewById(R.id.tvChooseAddress).setOnClickListener(v -> {
+            Intent intent = new Intent(this, AddressListActivity.class);
+            intent.putExtra("selectMode", true);
+            selectAddressLauncher.launch(intent);
+        });
 
         MaterialButton btnPlaceOrder = findViewById(R.id.btnPlaceOrder);
         btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
@@ -69,6 +91,24 @@ public class CheckoutActivity extends AppCompatActivity {
         }
         renderOrderItems();
         updateTotals();
+        loadDefaultAddress();
+    }
+
+    private void loadDefaultAddress() {
+        addressHelper.getDefaultAddress().addOnSuccessListener(defaultAddr -> {
+            if (defaultAddr != null) {
+                fillAddressFields(defaultAddr);
+            } else {
+                cbSaveAddress.setVisibility(View.VISIBLE);
+                cbSaveAddress.setChecked(true);
+            }
+        });
+    }
+
+    private void fillAddressFields(Address addr) {
+        edtFullName.setText(addr.getFullName());
+        edtPhone.setText(addr.getPhone());
+        edtAddress.setText(addr.getAddress());
     }
 
     private void renderOrderItems() {
@@ -121,6 +161,10 @@ public class CheckoutActivity extends AppCompatActivity {
         if (cartProducts.isEmpty()) {
             Toast.makeText(this, "Giỏ hàng đang trống", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        if (cbSaveAddress.getVisibility() == View.VISIBLE && cbSaveAddress.isChecked()) {
+            addressHelper.saveAddress(new Address(fullName, phone, address, "Nhà riêng", true));
         }
 
         submitOrder(fullName, phone, address, note, getPaymentMethod());

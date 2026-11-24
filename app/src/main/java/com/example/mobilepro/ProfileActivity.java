@@ -41,6 +41,9 @@ public class ProfileActivity extends AppCompatActivity {
         btnFavorites.setOnClickListener(v ->
                 startActivity(new Intent(ProfileActivity.this, FavoriteActivity.class)));
 
+        findViewById(R.id.btnAddresses).setOnClickListener(v ->
+                startActivity(new Intent(ProfileActivity.this, AddressListActivity.class)));
+
         btnChangePassword.setOnClickListener(v ->
                 Toast.makeText(this, "Đổi mật khẩu (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
 

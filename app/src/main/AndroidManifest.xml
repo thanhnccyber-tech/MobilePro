@@ -41,6 +41,10 @@
         <activity android:name=".EditProfileActivity" />
 
         <activity android:name=".FavoriteActivity" />
+
+        <activity android:name=".AddressListActivity" />
+
+        <activity android:name=".AddEditAddressActivity" />
     </application>
 
 </manifest>
