@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -42,20 +43,19 @@ public class ProductListActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        ListView listView = findViewById(R.id.listView);
-        adapter = new ProductAdapter(this, filteredProducts);
-        listView.setAdapter(adapter);
+        RecyclerView recyclerView = findViewById(R.id.recyclerProducts);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        setupSearchAndFilter();
-        loadCategoriesFromFirestore();
-        loadProductsFromFirestore();
-
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            Product product = filteredProducts.get(position);
+        adapter = new ProductAdapter(this, filteredProducts, product -> {
             Intent intent = new Intent(ProductListActivity.this, ProductDetailActivity.class);
             intent.putExtra("product", product);
             startActivity(intent);
         });
+        recyclerView.setAdapter(adapter);
+
+        setupSearchAndFilter();
+        loadCategoriesFromFirestore();
+        loadProductsFromFirestore();
 
         drawerLayout = findViewById(R.id.drawerLayout);
         NavigationView navigationView = findViewById(R.id.navigationView);
@@ -67,7 +67,7 @@ public class ProductListActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_explore) {
-                listView.setSelection(0);
+                recyclerView.scrollToPosition(0);
             } else if (id == R.id.nav_home) {
                 startActivity(new Intent(ProductListActivity.this, HomeActivity.class));
                 finish();
@@ -107,6 +107,16 @@ public class ProductListActivity extends AppCompatActivity {
             }
 
             return false;
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        new FirebaseFavoriteHelper().getFavoriteIds().addOnSuccessListener(ids -> {
+            if (adapter != null) {
+                adapter.setFavoriteIds(ids);
+            }
         });
     }
 
@@ -179,6 +189,7 @@ public class ProductListActivity extends AppCompatActivity {
                     allProducts.clear();
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         Product product = document.toObject(Product.class);
+                        product.setDocumentId(document.getId());
                         if (product.getImageResId() == 0) product.setImageResId(R.drawable.banhkem);
                         if (product.getCategory() == null) product.setCategory("Khác");
                         allProducts.add(product);

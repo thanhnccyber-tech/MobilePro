@@ -2,9 +2,11 @@ package com.example.mobilepro;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -89,6 +91,21 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvDescription.setText(product.getDescription());
             updateAddToCartButton();
 
+            ImageButton btnDetailFavorite = findViewById(R.id.btnDetailFavorite);
+            FirebaseFavoriteHelper favHelper = new FirebaseFavoriteHelper();
+
+            favHelper.isFavorite(product).addOnSuccessListener(isFav ->
+                    updateDetailFavoriteIcon(btnDetailFavorite, isFav));
+
+            btnDetailFavorite.setOnClickListener(v -> {
+                btnDetailFavorite.setEnabled(false);
+                favHelper.toggleFavorite(product).addOnSuccessListener(nowFav -> {
+                    btnDetailFavorite.setEnabled(true);
+                    updateDetailFavoriteIcon(btnDetailFavorite, nowFav);
+                    Toast.makeText(this, nowFav ? "Đã thêm vào yêu thích" : "Đã bỏ yêu thích", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> btnDetailFavorite.setEnabled(true));
+            });
+
             btnAddToCart.setOnClickListener(v ->
                     new FirebaseCartHelper().addToCart(product, quantity)
                             .addOnSuccessListener(unused -> {
@@ -115,6 +132,16 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvQuantity.setText(String.valueOf(quantity));
             updateAddToCartButton();
         });
+    }
+
+    private void updateDetailFavoriteIcon(ImageButton btn, boolean isFav) {
+        if (isFav) {
+            btn.setImageResource(R.drawable.ic_heart_filled);
+            btn.clearColorFilter();
+        } else {
+            btn.setImageResource(R.drawable.ic_heart_outline);
+            btn.setColorFilter(Color.WHITE);
+        }
     }
 
     private void updateAddToCartButton() {

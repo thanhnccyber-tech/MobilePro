@@ -21,9 +21,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         TextView tvUsername = findViewById(R.id.tvProfileUsername);
         Button btnEditInfo = findViewById(R.id.btnEditInfo);
+        Button btnOrderHistory = findViewById(R.id.btnOrderHistory);
+        Button btnFavorites = findViewById(R.id.btnFavorites);
         Button btnChangePassword = findViewById(R.id.btnChangePassword);
         Button btnUserGuide = findViewById(R.id.btnUserGuide);
-        Button btnOrderHistory = findViewById(R.id.btnOrderHistory);
         Button btnLogout = findViewById(R.id.btnLogout);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
 
@@ -36,6 +37,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnOrderHistory.setOnClickListener(v ->
                 startActivity(new Intent(ProfileActivity.this, OrderHistoryActivity.class)));
+
+        btnFavorites.setOnClickListener(v ->
+                startActivity(new Intent(ProfileActivity.this, FavoriteActivity.class)));
 
         btnChangePassword.setOnClickListener(v ->
                 Toast.makeText(this, "Đổi mật khẩu (chưa gán chức năng)", Toast.LENGTH_SHORT).show());

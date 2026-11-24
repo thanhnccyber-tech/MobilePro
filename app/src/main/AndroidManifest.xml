@@ -39,6 +39,8 @@
         <activity android:name=".OrderDetailActivity" />
 
         <activity android:name=".EditProfileActivity" />
+
+        <activity android:name=".FavoriteActivity" />
     </application>
 
 </manifest>

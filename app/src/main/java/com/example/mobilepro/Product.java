@@ -13,7 +13,6 @@ public class Product implements Serializable {
     private int quantity;
     private String imageUrl;
 
-    @Exclude
     private String documentId;
 
     public Product() {

@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -24,7 +26,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private final List<Category> categoryList = new ArrayList<>();
     private final List<Product> featuredProducts = new ArrayList<>();
-    private LinearLayout layoutCategories, layoutFeaturedProducts;
+    private LinearLayout layoutCategories;
+    private RecyclerView recyclerFeaturedProducts;
+    private ProductAdapter featuredAdapter;
     private DrawerLayout drawerLayout;
     private FirebaseFirestore db;
 
@@ -35,7 +39,8 @@ public class HomeActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         layoutCategories = findViewById(R.id.layoutCategories);
-        layoutFeaturedProducts = findViewById(R.id.layoutFeaturedProducts);
+        recyclerFeaturedProducts = findViewById(R.id.recyclerFeaturedProducts);
+        recyclerFeaturedProducts.setLayoutManager(new GridLayoutManager(this, 2));
 
         String username = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("username", "");
         TextView tvWelcome = findViewById(R.id.tvWelcomeUser);
@@ -115,6 +120,7 @@ public class HomeActivity extends AppCompatActivity {
         String username = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("username", "");
         TextView tvWelcome = findViewById(R.id.tvWelcomeUser);
         if (!username.isEmpty()) tvWelcome.setText("Xin chào, " + username);
+        loadFavoriteIds();
     }
 
     private void loadCategories() {
@@ -163,18 +169,20 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void renderFeaturedProducts() {
-        layoutFeaturedProducts.removeAllViews();
-        ProductAdapter adapter = new ProductAdapter(this, featuredProducts);
-        for (int i = 0; i < adapter.getCount(); i++) {
-            Product product = featuredProducts.get(i);
-            View itemView = adapter.getView(i, null, layoutFeaturedProducts);
-            itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(HomeActivity.this, ProductDetailActivity.class);
-                intent.putExtra("product", product);
-                startActivity(intent);
-            });
-            layoutFeaturedProducts.addView(itemView);
-        }
+        featuredAdapter = new ProductAdapter(this, featuredProducts, product -> {
+            Intent intent = new Intent(HomeActivity.this, ProductDetailActivity.class);
+            intent.putExtra("product", product);
+            startActivity(intent);
+        });
+        recyclerFeaturedProducts.setAdapter(featuredAdapter);
+        loadFavoriteIds();
     }
 
+    private void loadFavoriteIds() {
+        new FirebaseFavoriteHelper().getFavoriteIds().addOnSuccessListener(ids -> {
+            if (featuredAdapter != null) {
+                featuredAdapter.setFavoriteIds(ids);
+            }
+        });
+    }
 }
