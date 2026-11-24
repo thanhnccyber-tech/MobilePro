@@ -3,6 +3,7 @@ package com.example.mobilepro;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextInputLayout tilUsername, tilPassword;
     private TextInputEditText edtUsername, edtPassword;
+    private CheckBox cbRememberMe;
     private MaterialButton btnLogin;
     private TextView tvGoToRegister;
     private FirebaseAuth mAuth;
@@ -25,14 +27,29 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        boolean rememberMe = prefs.getBoolean("remember_me", false);
+
+        if (mAuth.getCurrentUser() != null) {
+            if (rememberMe) {
+                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                finish();
+                return;
+            } else {
+                mAuth.signOut();
+                prefs.edit().remove("username").remove("avatarUrl").apply();
+            }
+        }
+
+        setContentView(R.layout.activity_login);
 
         tilUsername = findViewById(R.id.tilUsername);
         tilPassword = findViewById(R.id.tilPassword);
         edtUsername = findViewById(R.id.edtLoginUsername);
         edtPassword = findViewById(R.id.edtLoginPassword);
+        cbRememberMe = findViewById(R.id.cbRememberMe);
         btnLogin = findViewById(R.id.btnLogin);
         tvGoToRegister = findViewById(R.id.tvGoToRegister);
 
@@ -82,9 +99,10 @@ public class LoginActivity extends AppCompatActivity {
                                                 }
                                             }
                                         }
-                                        getSharedPreferences("user_prefs", MODE_PRIVATE).edit()
+                                        prefs.edit()
                                                 .putString("username", displayName)
                                                 .putString("avatarUrl", avatarUrl)
+                                                .putBoolean("remember_me", cbRememberMe.isChecked())
                                                 .apply();
 
                                         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();

@@ -78,8 +78,9 @@ public class ProductListActivity extends AppCompatActivity {
                 startActivity(new Intent(ProductListActivity.this, ProfileActivity.class));
                 finish();
             } else if (id == R.id.nav_logout) {
-                getSharedPreferences("user_prefs", MODE_PRIVATE).edit().remove("username").apply();
-                Intent intent = new Intent(ProductListActivity.this, LoginActivity.class);
+                com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
+                getSharedPreferences("user_prefs", MODE_PRIVATE).edit().clear().apply();
+                Intent intent = new Intent(this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }

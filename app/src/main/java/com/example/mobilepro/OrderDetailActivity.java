@@ -1,5 +1,6 @@
 package com.example.mobilepro;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,18 +11,22 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class OrderDetailActivity extends AppCompatActivity {
 
     private Order order;
     private TextView tvStatus;
-    private MaterialButton btnCancelOrder;
+    private MaterialButton btnCancelOrder, btnReorder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         TextView tvShipping = findViewById(R.id.tvDetailShipping);
         TextView tvTotal = findViewById(R.id.tvDetailTotal);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
+        btnReorder = findViewById(R.id.btnReorder);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 
@@ -85,11 +91,48 @@ public class OrderDetailActivity extends AppCompatActivity {
         }
 
         btnCancelOrder.setOnClickListener(v -> confirmCancelOrder());
+        btnReorder.setOnClickListener(v -> handleReorder());
     }
 
     private void updateStatusUI() {
         Order.bindStatusBadge(tvStatus, order.status);
-        btnCancelOrder.setVisibility(Order.STATUS_PENDING.equals(order.status) ? View.VISIBLE : View.GONE);
+
+        boolean isPending = Order.STATUS_PENDING.equals(order.status);
+        boolean canReorder = Order.STATUS_COMPLETED.equals(order.status)
+                || Order.STATUS_CANCELLED.equals(order.status);
+
+        btnCancelOrder.setVisibility(isPending ? View.VISIBLE : View.GONE);
+        btnReorder.setVisibility(canReorder ? View.VISIBLE : View.GONE);
+    }
+
+    private void handleReorder() {
+        if (order.items == null || order.items.isEmpty()) {
+            Toast.makeText(this, "Không có sản phẩm để mua lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnReorder.setEnabled(false);
+        btnReorder.setText("Đang thêm vào giỏ...");
+
+        FirebaseCartHelper cartHelper = new FirebaseCartHelper();
+        List<Task<Void>> tasks = new ArrayList<>();
+
+        for (Product item : order.items) {
+            int qty = Math.max(1, item.getQuantity());
+            tasks.add(cartHelper.addToCart(item, qty));
+        }
+
+        Tasks.whenAll(tasks)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Đã thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this, CartActivity.class));
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    btnReorder.setEnabled(true);
+                    btnReorder.setText("Mua lại");
+                    Toast.makeText(this, "Lỗi mua lại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void confirmCancelOrder() {
