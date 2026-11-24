@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvUsername.setText(username);
 
         btnEditInfo.setOnClickListener(v ->
-                Toast.makeText(this, "Chỉnh sửa thông tin (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(ProfileActivity.this, EditProfileActivity.class)));
 
         btnOrderHistory.setOnClickListener(v ->
                 startActivity(new Intent(ProfileActivity.this, OrderHistoryActivity.class)));
@@ -68,5 +69,16 @@ public class ProfileActivity extends AppCompatActivity {
 
             return false;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        TextView tvUsername = findViewById(R.id.tvProfileUsername);
+        ImageView imgAvatar = findViewById(R.id.imgAvatar);
+
+        tvUsername.setText(prefs.getString("username", ""));
+        ImageLoader.loadAvatar(imgAvatar, prefs.getString("avatarUrl", ""));
     }
 }

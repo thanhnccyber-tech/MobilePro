@@ -1,5 +1,7 @@
 package com.example.mobilepro;
 
+import com.google.firebase.firestore.Exclude;
+
 import java.io.Serializable;
 
 public class Product implements Serializable {
@@ -10,6 +12,9 @@ public class Product implements Serializable {
     private int imageResId;
     private int quantity;
     private String imageUrl;
+
+    @Exclude
+    private String documentId;
 
     public Product() {
     }
@@ -48,6 +53,9 @@ public class Product implements Serializable {
     public void setQuantity(int quantity) { this.quantity = quantity; }
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getDocumentId() { return documentId; }
+    public void setDocumentId(String documentId) { this.documentId = documentId; }
 
     public static String formatPrice(int price) {
         return String.format("%,d", price).replace(",", ".") + "đ";

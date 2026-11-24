@@ -25,4 +25,13 @@ public class ImageLoader {
     public static void loadCategory(ImageView imageView, Category category) {
         load(imageView, category.getImageUrl(), 0, R.drawable.banhkem);
     }
+
+    // Hàm rút gọn riêng cho Avatar
+    public static void loadAvatar(ImageView imageView, String avatarUrl) {
+        Glide.with(imageView.getContext())
+                .load(avatarUrl)
+                .placeholder(R.drawable.logoute)
+                .error(R.drawable.logoute)
+                .into(imageView);
+    }
 }

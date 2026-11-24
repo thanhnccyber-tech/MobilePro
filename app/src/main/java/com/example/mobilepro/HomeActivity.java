@@ -109,6 +109,14 @@ public class HomeActivity extends AppCompatActivity {
         loadFeaturedProducts();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String username = getSharedPreferences("user_prefs", MODE_PRIVATE).getString("username", "");
+        TextView tvWelcome = findViewById(R.id.tvWelcomeUser);
+        if (!username.isEmpty()) tvWelcome.setText("Xin chào, " + username);
+    }
+
     private void loadCategories() {
         db.collection("categories").get().addOnSuccessListener(snap -> {
             categoryList.clear();
@@ -145,6 +153,7 @@ public class HomeActivity extends AppCompatActivity {
             for (DocumentSnapshot doc : snap) {
                 Product product = doc.toObject(Product.class);
                 if (product != null) {
+                    product.setDocumentId(doc.getId());
                     if (product.getImageResId() == 0) product.setImageResId(R.drawable.banhkem);
                     featuredProducts.add(product);
                 }
@@ -167,4 +176,5 @@ public class HomeActivity extends AppCompatActivity {
             layoutFeaturedProducts.addView(itemView);
         }
     }
+
 }

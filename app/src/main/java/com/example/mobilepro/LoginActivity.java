@@ -12,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -65,13 +66,31 @@ public class LoginActivity extends AppCompatActivity {
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-                            prefs.edit().putString("username", email).apply();
+                            String uid = mAuth.getCurrentUser().getUid();
+                            FirebaseFirestore.getInstance().collection("users").document(uid).get()
+                                    .addOnCompleteListener(profileTask -> {
+                                        String displayName = email;
+                                        String avatarUrl = "";
+                                        if (profileTask.isSuccessful() && profileTask.getResult() != null) {
+                                            UserProfile profile = profileTask.getResult().toObject(UserProfile.class);
+                                            if (profile != null) {
+                                                if (profile.getFullName() != null && !profile.getFullName().isEmpty()) {
+                                                    displayName = profile.getFullName();
+                                                }
+                                                if (profile.getAvatarUrl() != null) {
+                                                    avatarUrl = profile.getAvatarUrl();
+                                                }
+                                            }
+                                        }
+                                        getSharedPreferences("user_prefs", MODE_PRIVATE).edit()
+                                                .putString("username", displayName)
+                                                .putString("avatarUrl", avatarUrl)
+                                                .apply();
 
-                            Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                            startActivity(intent);
-                            finish();
+                                        Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                                        finish();
+                                    });
                         } else {
                             String error = task.getException() != null ? task.getException().getMessage() : "Sai thông tin";
                             Toast.makeText(this, "Đăng nhập thất bại: " + error, Toast.LENGTH_LONG).show();

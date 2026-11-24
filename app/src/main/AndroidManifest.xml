@@ -37,6 +37,8 @@
         <activity android:name=".OrderHistoryActivity" />
 
         <activity android:name=".OrderDetailActivity" />
+
+        <activity android:name=".EditProfileActivity" />
     </application>
 
 </manifest>
