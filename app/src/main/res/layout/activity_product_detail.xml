@@ -251,6 +251,37 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
+            <LinearLayout
+                android:id="@+id/layoutSimilarSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:dividerColor="@color/cream_border" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Sản phẩm tương tự"
+                    android:textColor="@color/brown"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerSimilarProducts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="-6dp"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

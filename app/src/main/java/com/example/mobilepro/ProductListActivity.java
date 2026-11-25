@@ -63,31 +63,7 @@ public class ProductListActivity extends AppCompatActivity {
 
         topAppBar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_explore) {
-                recyclerView.scrollToPosition(0);
-            } else if (id == R.id.nav_home) {
-                startActivity(new Intent(ProductListActivity.this, HomeActivity.class));
-                finish();
-            } else if (id == R.id.nav_cart) {
-                startActivity(new Intent(ProductListActivity.this, CartActivity.class));
-                finish();
-            } else if (id == R.id.nav_account) {
-                startActivity(new Intent(ProductListActivity.this, ProfileActivity.class));
-                finish();
-            } else if (id == R.id.nav_logout) {
-                com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
-                getSharedPreferences("user_prefs", MODE_PRIVATE).edit().clear().apply();
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            }
-
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
+        DrawerHelper.setup(this, drawerLayout, topAppBar, navigationView, R.id.nav_products);
 
         BottomNavHelper.setup(this, BottomNavHelper.TAB_EXPLORE);
     }

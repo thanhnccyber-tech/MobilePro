@@ -11,10 +11,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
@@ -37,6 +40,12 @@ public class ProfileActivity extends AppCompatActivity {
         Button btnChangePassword = findViewById(R.id.btnChangePassword);
         Button btnBakeryInfo = findViewById(R.id.btnBakeryInfo);
         Button btnLogout = findViewById(R.id.btnLogout);
+
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
+        NavigationView navigationView = findViewById(R.id.navigationView);
+
+        DrawerHelper.setup(this, drawerLayout, topAppBar, navigationView, R.id.nav_profile);
 
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
         String username = prefs.getString("username", "");

@@ -64,31 +64,7 @@ public class HomeActivity extends AppCompatActivity {
 
         topAppBar.setNavigationOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_home) {
-
-            } else if (id == R.id.nav_explore) {
-                startActivity(new Intent(HomeActivity.this, ProductListActivity.class));
-                finish();
-            } else if (id == R.id.nav_cart) {
-                startActivity(new Intent(HomeActivity.this, CartActivity.class));
-                finish();
-            } else if (id == R.id.nav_account) {
-                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-                finish();
-            } else if (id == R.id.nav_logout) {
-                com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
-                getSharedPreferences("user_prefs", MODE_PRIVATE).edit().clear().apply();
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-            }
-
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
+        DrawerHelper.setup(this, drawerLayout, topAppBar, navigationView, R.id.nav_home);
 
         BottomNavHelper.setup(this, BottomNavHelper.TAB_HOME);
 

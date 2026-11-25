@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
@@ -32,18 +34,24 @@ import java.util.Locale;
 public class ProductDetailActivity extends AppCompatActivity {
 
     private static final int MAX_VISIBLE_REVIEWS = 3;
+    private static final int MAX_SIMILAR_PRODUCTS = 6;
 
     private int quantity = 1;
     private Product product;
     private boolean isReviewsExpanded = false;
     private final List<Review> allReviews = new ArrayList<>();
+    private final List<Product> similarProducts = new ArrayList<>();
     private float totalRatingSum = 0;
 
     private TextView tvQuantity, tvRatingSummary, tvEmptyReviews, tvReviewsHeader, tvToggleReviews;
+    private ImageButton btnDetailFavorite;
     private MaterialButton btnAddToCart, btnSubmitReview;
     private RatingBar ratingBarInput;
     private TextInputEditText edtComment;
-    private LinearLayout layoutReviews;
+    private LinearLayout layoutReviews, layoutSimilarSection;
+    private RecyclerView recyclerSimilarProducts;
+    private ProductAdapter similarAdapter;
+    private FirebaseFavoriteHelper favHelper;
 
     private final SimpleDateFormat dateFormat =
             new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
@@ -53,11 +61,14 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
+        favHelper = new FirebaseFavoriteHelper();
+
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);
         ImageView imgDetail = findViewById(R.id.imgDetail);
         TextView tvName = findViewById(R.id.tvDetailName);
         TextView tvPrice = findViewById(R.id.tvDetailPrice);
         TextView tvDescription = findViewById(R.id.tvDetailDescription);
+        btnDetailFavorite = findViewById(R.id.btnDetailFavorite);
         btnAddToCart = findViewById(R.id.btnAddToCart);
         MaterialButton btnMinus = findViewById(R.id.btnMinus);
         MaterialButton btnPlus = findViewById(R.id.btnPlus);
@@ -71,6 +82,18 @@ public class ProductDetailActivity extends AppCompatActivity {
         edtComment = findViewById(R.id.edtComment);
         btnSubmitReview = findViewById(R.id.btnSubmitReview);
         layoutReviews = findViewById(R.id.layoutReviews);
+
+        layoutSimilarSection = findViewById(R.id.layoutSimilarSection);
+        recyclerSimilarProducts = findViewById(R.id.recyclerSimilarProducts);
+        recyclerSimilarProducts.setLayoutManager(new GridLayoutManager(this, 2));
+
+        similarAdapter = new ProductAdapter(this, similarProducts, selectedProduct -> {
+            Intent intent = new Intent(ProductDetailActivity.this, ProductDetailActivity.class);
+            intent.putExtra("product", selectedProduct);
+            startActivity(intent);
+            finish();
+        });
+        recyclerSimilarProducts.setAdapter(similarAdapter);
 
         topAppBar.setNavigationOnClickListener(v -> finish());
         findViewById(R.id.btnCart).setOnClickListener(v -> {
@@ -90,12 +113,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvPrice.setText("Giá: " + Product.formatPrice(product.getPrice()));
             tvDescription.setText(product.getDescription());
             updateAddToCartButton();
-
-            ImageButton btnDetailFavorite = findViewById(R.id.btnDetailFavorite);
-            FirebaseFavoriteHelper favHelper = new FirebaseFavoriteHelper();
-
-            favHelper.isFavorite(product).addOnSuccessListener(isFav ->
-                    updateDetailFavoriteIcon(btnDetailFavorite, isFav));
 
             btnDetailFavorite.setOnClickListener(v -> {
                 btnDetailFavorite.setEnabled(false);
@@ -117,6 +134,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             btnSubmitReview.setOnClickListener(v -> submitReview());
             loadReviews();
+            resolveCategoryAndLoadSimilar();
         }
 
         btnMinus.setOnClickListener(v -> {
@@ -132,6 +150,107 @@ public class ProductDetailActivity extends AppCompatActivity {
             tvQuantity.setText(String.valueOf(quantity));
             updateAddToCartButton();
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        syncFavoriteStates();
+    }
+
+    private void syncFavoriteStates() {
+        if (product == null) return;
+        favHelper.getFavoriteIds().addOnSuccessListener(ids -> {
+            String currentKey = FirebaseFavoriteHelper.getProductKey(product);
+            updateDetailFavoriteIcon(btnDetailFavorite, ids.contains(currentKey));
+            if (similarAdapter != null) {
+                similarAdapter.setFavoriteIds(ids);
+            }
+        });
+    }
+
+    private void resolveCategoryAndLoadSimilar() {
+        String category = product.getCategory();
+        boolean missingCategory = category == null || category.trim().isEmpty() || "Khác".equalsIgnoreCase(category);
+        boolean missingDocId = product.getDocumentId() == null || product.getDocumentId().isEmpty();
+
+        if (!missingCategory && !missingDocId) {
+            loadSimilarProducts(category);
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        if (!missingDocId) {
+            db.collection("products").document(product.getDocumentId()).get()
+                    .addOnSuccessListener(doc -> {
+                        if (doc.exists()) {
+                            String fetchedCategory = doc.getString("category");
+                            if (fetchedCategory != null && !fetchedCategory.isEmpty()) {
+                                product.setCategory(fetchedCategory);
+                                loadSimilarProducts(fetchedCategory);
+                            }
+                        }
+                    });
+        } else if (product.getName() != null && !product.getName().isEmpty()) {
+            db.collection("products").whereEqualTo("name", product.getName()).limit(1).get()
+                    .addOnSuccessListener(snap -> {
+                        if (!snap.isEmpty()) {
+                            DocumentSnapshot doc = snap.getDocuments().get(0);
+                            product.setDocumentId(doc.getId());
+                            String fetchedCategory = doc.getString("category");
+                            if (fetchedCategory != null && !fetchedCategory.isEmpty()) {
+                                product.setCategory(fetchedCategory);
+                                loadSimilarProducts(fetchedCategory);
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void loadSimilarProducts(String category) {
+        if (category == null || category.trim().isEmpty()) {
+            layoutSimilarSection.setVisibility(View.GONE);
+            return;
+        }
+
+        FirebaseFirestore.getInstance().collection("products")
+                .whereEqualTo("category", category)
+                .limit(MAX_SIMILAR_PRODUCTS + 1)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    similarProducts.clear();
+                    for (DocumentSnapshot doc : snap) {
+                        Product item = doc.toObject(Product.class);
+                        if (item == null) continue;
+                        item.setDocumentId(doc.getId());
+                        if (item.getImageResId() == 0) {
+                            item.setImageResId(R.drawable.banhkem);
+                        }
+
+                        if (isSameProduct(product, item)) continue;
+
+                        similarProducts.add(item);
+                        if (similarProducts.size() >= MAX_SIMILAR_PRODUCTS) break;
+                    }
+
+                    if (similarProducts.isEmpty()) {
+                        layoutSimilarSection.setVisibility(View.GONE);
+                    } else {
+                        layoutSimilarSection.setVisibility(View.VISIBLE);
+                        similarAdapter.notifyDataSetChanged();
+                        syncFavoriteStates();
+                    }
+                })
+                .addOnFailureListener(e -> layoutSimilarSection.setVisibility(View.GONE));
+    }
+
+    private boolean isSameProduct(Product a, Product b) {
+        if (a == null || b == null) return false;
+        if (a.getDocumentId() != null && !a.getDocumentId().isEmpty()
+                && a.getDocumentId().equals(b.getDocumentId())) {
+            return true;
+        }
+        return a.getName() != null && a.getName().equalsIgnoreCase(b.getName());
     }
 
     private void updateDetailFavoriteIcon(ImageButton btn, boolean isFav) {
