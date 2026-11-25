@@ -2,6 +2,7 @@ package com.example.mobilepro;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -34,7 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
         Button btnOrderHistory = findViewById(R.id.btnOrderHistory);
         Button btnFavorites = findViewById(R.id.btnFavorites);
         Button btnChangePassword = findViewById(R.id.btnChangePassword);
-        Button btnUserGuide = findViewById(R.id.btnUserGuide);
+        Button btnBakeryInfo = findViewById(R.id.btnBakeryInfo);
         Button btnLogout = findViewById(R.id.btnLogout);
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
 
@@ -56,8 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         btnChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
-        btnUserGuide.setOnClickListener(v ->
-                Toast.makeText(this, "Hướng dẫn sử dụng (chưa gán chức năng)", Toast.LENGTH_SHORT).show());
+        btnBakeryInfo.setOnClickListener(v -> showBakeryInfoDialog());
 
         btnLogout.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -165,5 +165,24 @@ public class ProfileActivity extends AppCompatActivity {
 
         tvUsername.setText(prefs.getString("username", ""));
         ImageLoader.loadAvatar(imgAvatar, prefs.getString("avatarUrl", ""));
+    }
+
+    private void showBakeryInfoDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_bakery_info, null);
+        dialog.setContentView(view);
+
+        MaterialButton btnClose = view.findViewById(R.id.btnCloseBakeryInfo);
+        MaterialButton btnCall = view.findViewById(R.id.btnCallBakery);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        btnCall.setOnClickListener(v -> {
+            Intent dialIntent = new Intent(Intent.ACTION_DIAL);
+            dialIntent.setData(Uri.parse("tel:0909123456"));
+            startActivity(dialIntent);
+        });
+
+        dialog.show();
     }
 }

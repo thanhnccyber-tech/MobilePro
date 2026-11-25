@@ -13,12 +13,16 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -32,12 +36,15 @@ public class CheckoutActivity extends AppCompatActivity {
     private FirebaseCartHelper cartHelper;
     private FirebaseAddressHelper addressHelper;
 
-    private TextInputLayout tilFullName, tilPhone, tilAddress;
-    private TextInputEditText edtFullName, edtPhone, edtAddress, edtNote;
+    private TextInputLayout tilFullName, tilPhone, tilAddress, tilVoucherCode;
+    private TextInputEditText edtFullName, edtPhone, edtAddress, edtNote, edtVoucherCode;
     private CheckBox cbSaveAddress;
-    private LinearLayout layoutOrderItems;
+    private LinearLayout layoutOrderItems, layoutAppliedVoucher, layoutCheckoutDiscount;
     private RadioGroup rgPayment;
-    private TextView tvSubtotal, tvShipping, tvTotal;
+    private TextView tvSubtotal, tvShipping, tvDiscount, tvTotal, tvAppliedVoucherInfo;
+
+    private Voucher appliedVoucher = null;
+    private int discountAmount = 0;
 
     private final ActivityResultLauncher<Intent> selectAddressLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -76,11 +83,22 @@ public class CheckoutActivity extends AppCompatActivity {
         tvShipping = findViewById(R.id.tvShipping);
         tvTotal = findViewById(R.id.tvTotal);
 
+        tilVoucherCode = findViewById(R.id.tilVoucherCode);
+        edtVoucherCode = findViewById(R.id.edtVoucherCode);
+        layoutAppliedVoucher = findViewById(R.id.layoutAppliedVoucher);
+        layoutCheckoutDiscount = findViewById(R.id.layoutCheckoutDiscount);
+        tvAppliedVoucherInfo = findViewById(R.id.tvAppliedVoucherInfo);
+        tvDiscount = findViewById(R.id.tvDiscount);
+
         findViewById(R.id.tvChooseAddress).setOnClickListener(v -> {
             Intent intent = new Intent(this, AddressListActivity.class);
             intent.putExtra("selectMode", true);
             selectAddressLauncher.launch(intent);
         });
+
+        findViewById(R.id.btnApplyVoucher).setOnClickListener(v -> applyManualVoucher());
+        findViewById(R.id.tvChooseVoucher).setOnClickListener(v -> showVoucherDialog());
+        findViewById(R.id.tvRemoveVoucher).setOnClickListener(v -> removeVoucher());
 
         MaterialButton btnPlaceOrder = findViewById(R.id.btnPlaceOrder);
         btnPlaceOrder.setOnClickListener(v -> handlePlaceOrder());
@@ -92,6 +110,91 @@ public class CheckoutActivity extends AppCompatActivity {
         renderOrderItems();
         updateTotals();
         loadDefaultAddress();
+    }
+
+    private void applyManualVoucher() {
+        tilVoucherCode.setError(null);
+        String code = edtVoucherCode.getText() != null
+                ? edtVoucherCode.getText().toString().trim().toUpperCase() : "";
+
+        if (code.isEmpty()) {
+            tilVoucherCode.setError("Vui lòng nhập mã giảm giá");
+            return;
+        }
+
+        FirebaseFirestore.getInstance().collection("vouchers")
+                .whereEqualTo("code", code)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    if (snap.isEmpty()) {
+                        tilVoucherCode.setError("Mã giảm giá không tồn tại");
+                        return;
+                    }
+                    Voucher voucher = snap.getDocuments().get(0).toObject(Voucher.class);
+                    if (voucher == null || !voucher.isActive()) {
+                        tilVoucherCode.setError("Mã giảm giá đã hết hạn");
+                        return;
+                    }
+                    applyVoucher(voucher);
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Lỗi kiểm tra mã: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    private void showVoucherDialog() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_voucher_list, null);
+        dialog.setContentView(view);
+
+        RecyclerView recyclerVouchers = view.findViewById(R.id.recyclerVouchers);
+        TextView tvEmpty = view.findViewById(R.id.tvEmptyVouchers);
+        view.findViewById(R.id.btnCloseVoucherDialog).setOnClickListener(v -> dialog.dismiss());
+
+        recyclerVouchers.setLayoutManager(new LinearLayoutManager(this));
+        List<Voucher> voucherList = new ArrayList<>();
+
+        FirebaseFirestore.getInstance().collection("vouchers")
+                .whereEqualTo("isActive", true)
+                .get()
+                .addOnSuccessListener(snap -> {
+                    for (DocumentSnapshot doc : snap) {
+                        Voucher v = doc.toObject(Voucher.class);
+                        if (v != null) voucherList.add(v);
+                    }
+                    tvEmpty.setVisibility(voucherList.isEmpty() ? View.VISIBLE : View.GONE);
+                    recyclerVouchers.setAdapter(new VoucherAdapter(this, voucherList, getSubtotal(), selected -> {
+                        applyVoucher(selected);
+                        dialog.dismiss();
+                    }));
+                });
+
+        dialog.show();
+    }
+
+    private void applyVoucher(Voucher voucher) {
+        int subtotal = getSubtotal();
+        if (subtotal < voucher.getMinOrderValue()) {
+            tilVoucherCode.setError("Đơn tối thiểu " + Product.formatPrice(voucher.getMinOrderValue()));
+            return;
+        }
+
+        int shipping = subtotal > 0 ? SHIPPING_FEE : 0;
+        appliedVoucher = voucher;
+        discountAmount = voucher.calculateDiscount(subtotal, shipping);
+
+        tilVoucherCode.setError(null);
+        edtVoucherCode.setText(voucher.getCode());
+        layoutAppliedVoucher.setVisibility(View.VISIBLE);
+        tvAppliedVoucherInfo.setText("Đã dùng mã " + voucher.getCode() + " (-" + Product.formatPrice(discountAmount) + ")");
+        updateTotals();
+    }
+
+    private void removeVoucher() {
+        appliedVoucher = null;
+        discountAmount = 0;
+        edtVoucherCode.setText("");
+        layoutAppliedVoucher.setVisibility(View.GONE);
+        updateTotals();
     }
 
     private void loadDefaultAddress() {
@@ -131,9 +234,18 @@ public class CheckoutActivity extends AppCompatActivity {
     private void updateTotals() {
         int subtotal = getSubtotal();
         int shipping = subtotal > 0 ? SHIPPING_FEE : 0;
+        int total = Math.max(0, subtotal + shipping - discountAmount);
+
         tvSubtotal.setText(Product.formatPrice(subtotal));
         tvShipping.setText(Product.formatPrice(shipping));
-        tvTotal.setText(Product.formatPrice(subtotal + shipping));
+        tvTotal.setText(Product.formatPrice(total));
+
+        if (discountAmount > 0) {
+            layoutCheckoutDiscount.setVisibility(View.VISIBLE);
+            tvDiscount.setText("-" + Product.formatPrice(discountAmount));
+        } else {
+            layoutCheckoutDiscount.setVisibility(View.GONE);
+        }
     }
 
     private void handlePlaceOrder() {
@@ -181,9 +293,10 @@ public class CheckoutActivity extends AppCompatActivity {
                              String note, String paymentMethod) {
         String uid = FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid() : "";
+        String voucherCode = appliedVoucher != null ? appliedVoucher.getCode() : "";
 
         Order order = new Order(uid, fullName, phone, address, note,
-                paymentMethod, cartProducts, getSubtotal(), SHIPPING_FEE);
+                paymentMethod, cartProducts, getSubtotal(), SHIPPING_FEE, voucherCode, discountAmount);
 
         FirebaseFirestore.getInstance().collection("orders").add(order)
                 .addOnSuccessListener(ref -> cartHelper.clearCart().addOnSuccessListener(unused -> {

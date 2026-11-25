@@ -71,6 +71,15 @@ public class OrderDetailActivity extends AppCompatActivity {
 
         tvSubtotal.setText(Product.formatPrice(order.subtotal));
         tvShipping.setText(Product.formatPrice(order.shippingFee));
+
+        if (order.discountAmount > 0) {
+            findViewById(R.id.layoutDetailDiscount).setVisibility(View.VISIBLE);
+            TextView tvDiscountLabel = findViewById(R.id.tvDetailDiscountLabel);
+            TextView tvDiscount = findViewById(R.id.tvDetailDiscount);
+            tvDiscountLabel.setText("Giảm giá (" + order.voucherCode + ")");
+            tvDiscount.setText("-" + Product.formatPrice(order.discountAmount));
+        }
+
         tvTotal.setText(Product.formatPrice(order.total));
 
         updateStatusUI();

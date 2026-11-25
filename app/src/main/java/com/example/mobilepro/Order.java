@@ -41,9 +41,9 @@ public class Order implements Serializable {
     @Exclude
     public String documentId;
 
-    public String userId, fullName, phone, address, note, paymentMethod, orderCode, status;
+    public String userId, fullName, phone, address, note, paymentMethod, orderCode, status, voucherCode;
     public List<Product> items;
-    public int subtotal, shippingFee, total;
+    public int subtotal, shippingFee, discountAmount, total;
     @ServerTimestamp
     public Date createdAt;
 
@@ -51,7 +51,7 @@ public class Order implements Serializable {
 
     public Order(String userId, String fullName, String phone, String address,
                  String note, String paymentMethod, List<Product> items,
-                 int subtotal, int shippingFee) {
+                 int subtotal, int shippingFee, String voucherCode, int discountAmount) {
         this.userId = userId;
         this.fullName = fullName;
         this.phone = phone;
@@ -61,7 +61,9 @@ public class Order implements Serializable {
         this.items = items;
         this.subtotal = subtotal;
         this.shippingFee = shippingFee;
-        this.total = subtotal + shippingFee;
+        this.voucherCode = voucherCode;
+        this.discountAmount = discountAmount;
+        this.total = Math.max(0, subtotal + shippingFee - discountAmount);
         this.orderCode = "BKR_" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         this.status = STATUS_PENDING;
     }
