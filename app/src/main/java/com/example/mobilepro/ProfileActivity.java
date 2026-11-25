@@ -34,12 +34,19 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         TextView tvUsername = findViewById(R.id.tvProfileUsername);
-        Button btnEditInfo = findViewById(R.id.btnEditInfo);
-        Button btnOrderHistory = findViewById(R.id.btnOrderHistory);
-        Button btnFavorites = findViewById(R.id.btnFavorites);
-        Button btnChangePassword = findViewById(R.id.btnChangePassword);
-        Button btnBakeryInfo = findViewById(R.id.btnBakeryInfo);
+        TextView tvEmail = findViewById(R.id.tvProfileEmail);
+        View btnEditInfo = findViewById(R.id.btnEditInfo);
+        View btnOrderHistory = findViewById(R.id.btnOrderHistory);
+        View btnFavorites = findViewById(R.id.btnFavorites);
+        View btnAddresses = findViewById(R.id.btnAddresses);
+        View btnChangePassword = findViewById(R.id.btnChangePassword);
+        View btnBakeryInfo = findViewById(R.id.btnBakeryInfo);
         Button btnLogout = findViewById(R.id.btnLogout);
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null && currentUser.getEmail() != null) {
+            tvEmail.setText(currentUser.getEmail());
+        }
 
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         MaterialToolbar topAppBar = findViewById(R.id.topAppBar);

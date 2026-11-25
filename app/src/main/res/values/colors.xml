@@ -8,9 +8,12 @@
     <color name="blue">#1933BD</color>
 
     <color name="cream">#F9F6F2</color>
+    <color name="cream_warm">#F3EAE0</color>
     <color name="brown">#2B1B12</color>
+    <color name="brown_medium">#4E342E</color>
     <color name="brown_soft">#8D6E63</color>
     <color name="caramel">#C68B59</color>
     <color name="brown_light">#6E5D53</color>
     <color name="cream_border">#E8DFD6</color>
+    <color name="red_soft">#FDF2F2</color>
 </resources>

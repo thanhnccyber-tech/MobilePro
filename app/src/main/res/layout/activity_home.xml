@@ -83,13 +83,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    app:cardBackgroundColor="@color/brown_soft"
+                    app:cardBackgroundColor="@android:color/transparent"
                     app:cardCornerRadius="18dp"
-                    app:cardElevation="3dp">
+                    app:cardElevation="4dp"
+                    app:strokeColor="@color/caramel"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_banner_fresh"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         android:padding="18dp">
@@ -114,7 +117,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginBottom="12dp"
                                 android:text="Hương vị ngọt ngào cho mọi khoảnh khắc"
-                                android:textColor="@color/cream"
+                                android:textColor="@color/cream_border"
                                 android:textSize="13sp" />
 
                             <com.google.android.material.button.MaterialButton
@@ -127,7 +130,7 @@
                                 android:textColor="@color/white"
                                 android:textSize="13sp"
                                 android:textStyle="bold"
-                                app:backgroundTint="@color/caramel"
+                                app:backgroundTint="#A46A34"
                                 app:cornerRadius="19dp" />
                         </LinearLayout>
 
