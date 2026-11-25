@@ -90,26 +90,7 @@ public class HomeActivity extends AppCompatActivity {
             return true;
         });
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setSelectedItemId(R.id.nav_bottom_home);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_bottom_home) {
-                return true;
-            } else if (id == R.id.nav_bottom_explore) {
-                startActivity(new Intent(HomeActivity.this, ProductListActivity.class));
-                finish();
-            } else if (id == R.id.nav_bottom_cart) {
-                startActivity(new Intent(HomeActivity.this, CartActivity.class));
-                finish();
-            } else if (id == R.id.nav_bottom_account) {
-                startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
-                finish();
-            }
-
-            return false;
-        });
+        BottomNavHelper.setup(this, BottomNavHelper.TAB_HOME);
 
         loadCategories();
         loadFeaturedProducts();

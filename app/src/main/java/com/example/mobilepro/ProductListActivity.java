@@ -89,26 +89,7 @@ public class ProductListActivity extends AppCompatActivity {
             return true;
         });
 
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setSelectedItemId(R.id.nav_bottom_explore);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_bottom_explore) {
-                return true;
-            } else if (id == R.id.nav_bottom_home) {
-                startActivity(new Intent(ProductListActivity.this, HomeActivity.class));
-                finish();
-            } else if (id == R.id.nav_bottom_cart) {
-                startActivity(new Intent(ProductListActivity.this, CartActivity.class));
-                finish();
-            } else if (id == R.id.nav_bottom_account) {
-                startActivity(new Intent(ProductListActivity.this, ProfileActivity.class));
-                finish();
-            }
-
-            return false;
-        });
+        BottomNavHelper.setup(this, BottomNavHelper.TAB_EXPLORE);
     }
 
     @Override

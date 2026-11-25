@@ -37,7 +37,6 @@ public class ProfileActivity extends AppCompatActivity {
         Button btnChangePassword = findViewById(R.id.btnChangePassword);
         Button btnBakeryInfo = findViewById(R.id.btnBakeryInfo);
         Button btnLogout = findViewById(R.id.btnLogout);
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
 
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
         String username = prefs.getString("username", "");
@@ -67,25 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        bottomNav.setSelectedItemId(R.id.nav_bottom_account);
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-
-            if (id == R.id.nav_bottom_account) {
-                return true;
-            } else if (id == R.id.nav_bottom_explore) {
-                startActivity(new Intent(ProfileActivity.this, ProductListActivity.class));
-                finish();
-            } else if (id == R.id.nav_bottom_home) {
-                startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
-                finish();
-            } else if (id == R.id.nav_bottom_cart) {
-                startActivity(new Intent(ProfileActivity.this, CartActivity.class));
-                finish();
-            }
-
-            return false;
-        });
+        BottomNavHelper.setup(this, BottomNavHelper.TAB_ACCOUNT);
     }
 
     private void showChangePasswordDialog() {

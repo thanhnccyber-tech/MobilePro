@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +32,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     private final List<Product> productList;
     private final OnProductClickListener listener;
     private final FirebaseFavoriteHelper favHelper = new FirebaseFavoriteHelper();
+    private final FirebaseCartHelper cartHelper = new FirebaseCartHelper();
     private Set<String> favoriteIds = new HashSet<>();
     private OnFavoriteChangedListener favoriteChangedListener;
 
@@ -85,6 +88,19 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }).addOnFailureListener(e -> holder.btnFavorite.setEnabled(true));
         });
 
+        holder.btnQuickAddCart.setOnClickListener(v -> {
+            holder.btnQuickAddCart.setEnabled(false);
+            cartHelper.addToCart(product, 1)
+                    .addOnSuccessListener(unused -> {
+                        holder.btnQuickAddCart.setEnabled(true);
+                        Toast.makeText(context, "Đã thêm " + product.getName() + " vào giỏ", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        holder.btnQuickAddCart.setEnabled(true);
+                        Toast.makeText(context, "Lỗi thêm giỏ: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        });
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onProductClick(product);
@@ -101,6 +117,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         ImageView imgProduct;
         ImageButton btnFavorite;
         TextView tvName, tvPrice;
+        MaterialButton btnQuickAddCart;
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,6 +125,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             btnFavorite = itemView.findViewById(R.id.btnFavorite);
             tvName = itemView.findViewById(R.id.tvProductName);
             tvPrice = itemView.findViewById(R.id.tvProductPrice);
+            btnQuickAddCart = itemView.findViewById(R.id.btnQuickAddCart);
         }
     }
 }
